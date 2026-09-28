@@ -1,0 +1,284 @@
+.notifications-page-container {
+  padding: 32px 40px; /* Pinalaki ang padding */
+  color: #ffffff;
+  width: 100%;
+  max-width: 1280px; /* Pinalaki mula 1100px patungong 1280px */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* HEADER SECTION */
+.notifications-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+.sub-title {
+  font-size: 13px; /* Pinalaki */
+  letter-spacing: 1.8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.notifications-header-row h1 {
+  font-size: 32px; /* Pinalaki ang Title */
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+}
+
+.subtitle-desc {
+  font-size: 15px; /* Pinalaki */
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.mark-all-read-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 10px 18px; /* Pinalaki button */
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mark-all-read-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* FILTER TABS */
+.filter-tabs-wrapper {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.filter-tab-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 10px 22px; /* Pinalaki padding */
+  border-radius: 20px;
+  font-size: 14px; /* Pinalaki font */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.filter-tab-btn.active {
+  background: #7c3aed; /* Vibrant Violet */
+  color: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+/* NOTIFICATION CARDS */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background: rgba(30, 24, 48, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 20px 24px; /* Pinalaki card inner space */
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.notification-card:hover {
+  background: rgba(40, 32, 64, 0.75);
+  transform: translateY(-2px);
+}
+
+.notification-card.unread {
+  background: rgba(45, 30, 75, 0.7);
+  border-left: 4px solid #a855f7;
+}
+
+/* ICON BOX */
+.notif-icon-box {
+  width: 48px; /* Pinalaki icon box */
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px; /* Pinalaki emoji icon */
+  flex-shrink: 0;
+}
+
+/* CONTENT BOX */
+.notif-content-box {
+  flex: 1;
+}
+
+.notif-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.notif-top-row h3 {
+  font-size: 17px; /* Pinalaki heading */
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+}
+
+.notif-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-text {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #a855f7;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.notif-description {
+  font-size: 15px; /* Pinalaki description text */
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+}
+
+/* ACTIONS & BADGES */
+.notif-action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.action-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.accept-btn {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.accept-btn:hover {
+  background: #059669;
+}
+
+.decline-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.decline-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.status-badge.accepted {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.status-badge.declined {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.empty-notifications {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+}
+/* Notification header buttons */
+.notification-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.delete-all-notifications-btn,
+.delete-notification-btn {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.delete-all-notifications-btn:hover,
+.delete-notification-btn:hover {
+  background: rgba(248, 113, 113, 0.18);
+  transform: translateY(-1px);
+}
+
+.delete-all-notifications-btn:disabled,
+.delete-notification-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.notif-delete-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .notification-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

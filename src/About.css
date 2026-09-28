@@ -1,0 +1,203 @@
+/* Container - Sinisigurado nitong kasya lahat sa screen (no scrollbar) */
+.about-page-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-color: #06060c;
+  background-image: 
+    radial-gradient(ellipse at 88% 20%, rgba(212, 140, 50, 0.28) 0%, rgba(120, 60, 180, 0.18) 35%, transparent 70%),
+    radial-gradient(circle at 15% 85%, rgba(90, 40, 160, 0.15) 0%, transparent 55%),
+    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 30px 30px;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+/* Navigation bar */
+.about-page-container .navbar {
+  width: 100%;
+  padding: 2.2rem 0;
+  z-index: 20;
+}
+
+.about-page-container .navbar-inner {
+  width: 96%;
+  max-width: 1700px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.about-page-container .brand-main-text {
+  font-size: 2.6rem;
+  font-weight: 900;
+  font-style: italic;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.about-page-container .navbar-links {
+  display: flex;
+  list-style: none;
+  gap: 4.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.about-page-container .navbar-links a {
+  position: relative;
+  text-decoration: none;
+  color: #8d94a5;
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.4px;
+  padding: 0.4rem 0;
+  transition: color 0.25s ease;
+}
+
+.about-page-container .navbar-links a::after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  transition: width 0.25s ease;
+  border-radius: 2px;
+}
+
+.about-page-container .navbar-links a.active,
+.about-page-container .navbar-links a:hover {
+  color: #ffffff;
+}
+
+.about-page-container .navbar-links a.active::after,
+.about-page-container .navbar-links a:hover::after {
+  width: 100%;
+}
+
+/* Header Buttons */
+.btn-secondary {
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.7rem 1.6rem;
+  border-radius: 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #a855f7;
+  color: #a855f7;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(236, 72, 153, 0.6);
+}
+
+/* Main Content Wrapper - Centered Vertically */
+.about-content-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.about-inner {
+  width: 96%;
+  max-width: 1700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 0.8rem;
+  letter-spacing: -1px;
+}
+
+.section-subtitle {
+  font-size: 1.15rem;
+  color: #8d94a5;
+  margin-bottom: 3.5rem;
+  max-width: 600px;
+}
+
+/* Step Cards Grid */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  width: 100%;
+}
+
+.step-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 3.5rem 2.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(236, 72, 153, 0.5);
+}
+
+.step-number {
+  font-size: 2.8rem;
+  font-weight: 900;
+  font-style: italic;
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.2rem;
+}
+
+.step-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.step-desc {
+  font-size: 1.05rem;
+  color: #8d94a5;
+  line-height: 1.6;
+}
