@@ -6,8 +6,8 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import './Messages.css';
 
-const API_URL = 'http://localhost:5000/api';
-const SOCKET_URL = 'http://localhost:5000';
+const API_URL = 'https://skilllink-backend-v277.onrender.com/api';
+const SOCKET_URL = 'https://skilllink-backend-v277.onrender.com';
 
 function Messages() {
   const location = useLocation();

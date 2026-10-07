@@ -153,7 +153,7 @@ function Signup({ onSwitchToLogin, onGoHome, onSignupSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/signup',
+        'https://skilllink-backend-v277.onrender.com/api/auth/signup',
         {
           username: formData.username,
           fullName: formData.username,
@@ -202,7 +202,7 @@ function Signup({ onSwitchToLogin, onGoHome, onSignupSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/verify-otp',
+        'https://skilllink-backend-v277.onrender.com/api/auth/verify-otp',
         {
           email: formData.email,
           otp: otp.trim(),
@@ -243,7 +243,7 @@ function Signup({ onSwitchToLogin, onGoHome, onSignupSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/resend-otp',
+        'https://skilllink-backend-v277.onrender.com/api/auth/resend-otp',
         {
           email: formData.email,
           signupToken: signupToken

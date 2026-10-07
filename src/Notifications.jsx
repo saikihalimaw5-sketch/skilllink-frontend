@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './Notifications.css';
 
-const API_URL = 'http://localhost:5000';
-const SOCKET_URL = 'http://localhost:5000';
+const API_URL = 'https://skilllink-backend-v277.onrender.com';
+const SOCKET_URL = 'https://skilllink-backend-v277.onrender.com';
 
 function Notifications() {
   const navigate = useNavigate();

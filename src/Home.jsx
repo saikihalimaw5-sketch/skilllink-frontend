@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Discover from './Discover';
 import Settings from './Settings';
 import Messages from './Messages';
 import Notifications from './Notifications';
+import MyProjects from './MyProjects';
 import './Home.css';
 
 // Dictionary ng hobby icons
@@ -433,6 +433,9 @@ function Home({ onGoToHobbies }) {
           {/* Discover Tab */}
           {activeTab === 'Discover' && <Discover />}
 
+          {/* My Projects Tab */}
+          {activeTab === 'My Projects' && <MyProjects />}
+
           {/* Message Tab */}
           {activeTab === 'Message' && <Messages />}
 
@@ -445,6 +448,7 @@ function Home({ onGoToHobbies }) {
           {/* Other Tabs Placeholder */}
           {activeTab !== 'Home' &&
             activeTab !== 'Discover' &&
+            activeTab !== 'My Projects' &&
             activeTab !== 'Message' &&
             activeTab !== 'Notifications' &&
             activeTab !== 'Settings' && (

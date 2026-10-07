@@ -93,7 +93,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/forgot-password',
+        'https://skilllink-backend-v277.onrender.com/api/auth/forgot-password',
         {
           email: cleanEmail
         }
@@ -129,7 +129,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/forgot-password',
+        'https://skilllink-backend-v277.onrender.com/api/auth/forgot-password',
         {
           email: email.trim().toLowerCase()
         }
@@ -180,7 +180,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/reset-password',
+        'https://skilllink-backend-v277.onrender.com/api/auth/reset-password',
         {
           email: email.trim().toLowerCase(),
           otp: otp.trim(),
