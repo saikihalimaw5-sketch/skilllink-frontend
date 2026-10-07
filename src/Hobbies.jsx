@@ -24,7 +24,7 @@ function Hobbies({ onContinue, onSkip }) {
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem('token');
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://skilllink-backend-v277.onrender.com';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
   // Load existing hobbies mula sa LocalStorage at MongoDB pag-open ng page
   useEffect(() => {
