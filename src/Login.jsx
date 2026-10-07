@@ -116,7 +116,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/login',
+        'https://skilllink-backend-v277.onrender.com/api/auth/login',
         {
           email: formData.email.trim(),
           password: formData.password
@@ -167,7 +167,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/verify-otp',
+        'https://skilllink-backend-v277.onrender.com/api/auth/verify-otp',
         {
           email: formData.email.trim(),
           otp: otp.trim()
@@ -210,7 +210,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/resend-otp',
+        'https://skilllink-backend-v277.onrender.com/api/auth/resend-otp',
         {
           email: formData.email.trim()
         }
@@ -254,7 +254,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/forgot-password',
+        'https://skilllink-backend-v277.onrender.com/api/auth/forgot-password',
         {
           email: resetEmail.trim()
         }
@@ -320,7 +320,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/reset-password',
+        'https://skilllink-backend-v277.onrender.com/api/auth/reset-password',
         {
           email: resetEmail.trim(),
           otp: resetOtp.trim(),
