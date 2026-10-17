@@ -1,21 +1,29 @@
-/* Base reset & typography */
+/* Base reset and typography */
 html {
-  scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
 }
 
-html, body {
+body {
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
   background-color: #06060c;
   color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
   overflow-x: hidden;
 }
 
 * {
   box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
 }
 
 /* Main container */
@@ -26,10 +34,22 @@ html, body {
   width: 100%;
   position: relative;
   background-color: #06060c;
-  background-image: 
-    radial-gradient(ellipse at 88% 20%, rgba(212, 140, 50, 0.28) 0%, rgba(120, 60, 180, 0.18) 35%, transparent 70%),
-    radial-gradient(circle at 15% 85%, rgba(90, 40, 160, 0.15) 0%, transparent 55%),
-    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-image:
+    radial-gradient(
+      ellipse at 88% 20%,
+      rgba(212, 140, 50, 0.28) 0%,
+      rgba(120, 60, 180, 0.18) 35%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 15% 85%,
+      rgba(90, 40, 160, 0.15) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      rgba(255, 255, 255, 0.07) 1px,
+      transparent 1px
+    );
   background-size: 100% 100%, 100% 100%, 30px 30px;
   background-position: 0 0, 0 0, 0 0;
 }
@@ -53,10 +73,9 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
 }
 
-/* BRAND LOGO */
+/* Brand logo */
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -87,20 +106,22 @@ html, body {
   text-shadow: 0 0 14px rgba(168, 85, 247, 0.9);
 }
 
-/* NAVIGATION LINKS */
+/* Home and About on the upper-right */
 .navbar-links {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   list-style: none;
-  gap: 4.5rem;
+  gap: 2.5rem;
   margin: 0;
   padding: 0;
 }
 
-.navbar-links a {
+.navbar-links a,
+.navbar-links a:visited {
   position: relative;
+  display: inline-block;
   text-decoration: none;
   color: #8d94a5;
   font-weight: 600;
@@ -114,7 +135,7 @@ html, body {
 .navbar-links a::after {
   content: '';
   position: absolute;
-  width: 0%;
+  width: 0;
   height: 2px;
   bottom: 0;
   left: 0;
@@ -131,14 +152,14 @@ html, body {
   width: 100%;
 }
 
-/* Hero section - Full Screen Viewport */
+/* Hero section */
 .hero {
   width: 100%;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 5rem;
+  padding: 5rem 0 2rem;
   z-index: 10;
 }
 
@@ -154,6 +175,7 @@ html, body {
 .hero-content {
   flex: 1.1;
   max-width: 720px;
+  min-width: 0;
 }
 
 .hero-title {
@@ -161,7 +183,7 @@ html, body {
   font-weight: 900;
   color: #ffffff;
   line-height: 1.05;
-  margin-bottom: 1.8rem;
+  margin: 0 0 1.8rem;
   letter-spacing: -2.5px;
 }
 
@@ -169,25 +191,43 @@ html, body {
   font-size: 1.15rem;
   color: #8d94a5;
   line-height: 1.6;
-  margin-bottom: 2.5rem;
+  margin: 0 0 2.5rem;
   max-width: 580px;
 }
 
+/* Get Start and Explore side by side */
 .hero-buttons {
   display: flex;
-  gap: 1.4rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 1rem;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-  color: white;
-  border: none;
+.btn-primary,
+.btn-explore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 220px;
   width: 220px;
+  min-width: 0;
+  min-height: 48px;
   padding: 0.85rem 1.5rem;
   border-radius: 28px;
   font-size: 0.95rem;
   font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  border: none;
   box-shadow: 0 4px 20px rgba(168, 85, 247, 0.45);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -196,8 +236,38 @@ html, body {
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(236, 72, 153, 0.6);
 }
+
+/* Explore button: visual only for now */
+.btn-explore {
+  flex-basis: 180px;
+  width: 180px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.btn-explore:hover {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  border-color: #a855f7;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-primary:focus-visible,
+.btn-explore:focus-visible {
+  outline: 2px solid #d8b4fe;
+  outline-offset: 4px;
+}
+
+/* Hero image */
 .hero-image-container {
   flex: 1.1;
+  min-width: 0;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -205,6 +275,7 @@ html, body {
 }
 
 .hero-image {
+  display: block;
   width: 100%;
   max-width: 750px;
   height: auto;
@@ -219,100 +290,122 @@ html, body {
   transform: translateY(-4px);
 }
 
-/* How it works section - Full Screen Viewport */
-.how-it-works {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  z-index: 10;
-  scroll-margin-top: 0px;
-}
+/* Tablet responsive */
+@media (max-width: 1024px) {
+  .navbar-links {
+    gap: 1.5rem;
+  }
 
-.how-it-works-inner {
-  width: 96%;
-  max-width: 1700px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
+  .hero-inner {
+    gap: 2rem;
+  }
 
-.section-title {
-  font-size: 3.2rem;
-  font-weight: 900;
-  color: #ffffff;
-  margin-bottom: 0.8rem;
-  letter-spacing: -1px;
-}
-
-.section-subtitle {
-  font-size: 1.15rem;
-  color: #8d94a5;
-  margin-bottom: 4rem;
-  max-width: 600px;
-}
-
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2.5rem;
-  width: 100%;
-}
-
-.step-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  padding: 3rem 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-
-.step-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(236, 72, 153, 0.5);
-}
-
-.step-number {
-  font-size: 2.5rem;
-  font-weight: 900;
-  font-style: italic;
-  font-family: 'Impact', 'Arial Black', sans-serif;
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 1.2rem;
-}
-
-.step-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 1rem;
-}
-
-.step-desc {
-  font-size: 1rem;
-  color: #8d94a5;
-  line-height: 1.6;
+  .hero-title {
+    font-size: 3.8rem;
+  }
 }
 
 /* Mobile responsive */
-@media (max-width: 1024px) {
-  .navbar-links {
-    position: static;
-    transform: none;
-    gap: 1.5rem;
+@media (max-width: 600px) {
+  .navbar {
+    padding: 1.3rem 0;
   }
-  
-  .steps-grid {
-    grid-template-columns: 1fr;
+
+  .navbar-inner {
+    width: 92%;
+    gap: 1rem;
+  }
+
+  .brand-main-text {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+
+  .navbar-links {
+    gap: 1rem;
+  }
+
+  .navbar-links a,
+  .navbar-links a:visited {
+    font-size: 0.85rem;
+  }
+
+  .hero {
+    padding: 7rem 0 2rem;
+  }
+
+  .hero-inner {
+    width: 92%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+  }
+
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 9vw, 2.8rem);
+    letter-spacing: -1px;
+    margin-bottom: 1.3rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .hero-buttons {
+    gap: 0.75rem;
+  }
+
+  .btn-primary,
+  .btn-explore {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    padding: 0.85rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .hero-image-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-image {
+    width: 100%;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .navbar-inner {
+    width: 94%;
+  }
+
+  .brand-main-text {
+    font-size: 1.35rem;
+  }
+
+  .navbar-links {
+    gap: 0.7rem;
+  }
+
+  .navbar-links a,
+  .navbar-links a:visited {
+    font-size: 0.8rem;
+  }
+
+  .hero-buttons {
+    gap: 0.5rem;
+  }
+
+  .btn-primary,
+  .btn-explore {
+    padding: 0.8rem 0.3rem;
+    font-size: 0.8rem;
   }
 }

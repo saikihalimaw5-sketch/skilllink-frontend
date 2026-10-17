@@ -1,53 +1,152 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Settings.css';
+
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
+// Display-only SVG icons for Settings
+const SettingsIcon = ({ type, size = 24 }) => {
+  const icons = {
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+      </>
+    ),
+
+    shield: (
+      <>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </>
+    ),
+
+    help: (
+      <>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2.5-2.5 5" />
+        <path d="M12 17h.01" />
+      </>
+    ),
+
+    camera: (
+      <>
+        <path d="M4 7h4l2-3h4l2 3h4v13H4z" />
+        <circle cx="12" cy="13" r="4" />
+      </>
+    ),
+
+    mail: (
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="m3 7 9 6 9-6" />
+      </>
+    ),
+
+    phone: (
+      <path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.7L7.1 10a16 16 0 0 0 6.9 6.9l1.6-1.9a2 2 0 0 1 1.7-.6l3 .5a2 2 0 0 1 1.7 2z" />
+    ),
+
+    save: (
+      <>
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+        <path d="M17 21v-8H7v8M7 3v5h8" />
+      </>
+    ),
+
+    trash: (
+      <>
+        <path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15" />
+        <path d="M10 10v7M14 10v7" />
+      </>
+    ),
+    key: (
+  <>
+    <circle cx="8" cy="15" r="4" />
+    <path d="m11 12 9-9 2 2-3 3 2 2-3 3-2-2-3 3" />
+  </>
+),
+
+faq: (
+  <>
+    <rect x="4" y="3" width="16" height="18" rx="2" />
+    <path d="M8 8h8M8 12h5M8 16h4" />
+  </>
+),
+
+message: (
+  <path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9 9 0 0 1-4-.9L3 21l1.9-5A8.4 8.4 0 1 1 21 11.5z" />
+),
+
+warning: (
+  <>
+    <path d="m12 3 10 18H2L12 3z" />
+    <path d="M12 9v5M12 17h.01" />
+  </>
+),
+  };
+
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {icons[type] || null}
+    </svg>
+  );
+};
+
+
 
 function Settings() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(() => {
+  const savedTab = sessionStorage.getItem('skilllinkSettingsTab');
 
-  // 1. Profile Information
+  if (location.state?.settingsTab === 'privacy') {
+    return 'privacy';
+  }
+
+  return savedTab === 'privacy' ? 'privacy' : 'profile';
+});
+
   const [profileData, setProfileData] = useState({
-    fullName: '',
     username: '',
     email: '',
     phone: '',
-    bio: ''
+
   });
 
   const [profileImage, setProfileImage] = useState('');
+  const [avatarStyle, setAvatarStyle] = useState('avataaars');
   const [profileSaved, setProfileSaved] = useState(false);
   const [profileErrors, setProfileErrors] = useState({});
   const [profileLoading, setProfileLoading] = useState(true);
-
-  // 2. Profile Visibility
-  const [visibility, setVisibility] = useState('public');
-  const [visibilitySaved, setVisibilitySaved] = useState(false);
-
-  // 3. Privacy & Security
-  const [privacyAlert, setPrivacyAlert] = useState('');
-
-  // 4. Appearance
-  const [theme, setTheme] = useState('dark');
-
-  // 5. Help & Support
   const [helpSubView, setHelpSubView] = useState('menu');
   const [openFaq, setOpenFaq] = useState(null);
   const [ticketSubmitted, setTicketSubmitted] = useState(false);
 
-  // Get the logged-in account
   const getLoggedInUser = () => {
     try {
       const savedUser = localStorage.getItem('user');
 
-      if (!savedUser) {
-        return null;
-      }
+      if (!savedUser) return null;
 
       const parsedUser = JSON.parse(savedUser);
-
-      // Supports either { email: ... } or { user: { email: ... } }
       return parsedUser.user || parsedUser;
     } catch (error) {
       console.error('Unable to read logged-in user:', error);
@@ -55,156 +154,143 @@ function Settings() {
     }
   };
 
-  // Load profile information for the logged-in account
-  useEffect(() => {
+
+useEffect(() => {
+  let cancelled = false;
+
+  const loadProfile = async () => {
+    setProfileLoading(true);
+
     try {
       const user = getLoggedInUser();
+      const token = localStorage.getItem('token');
 
-      if (!user) {
+      if (!user || !token) {
         setProfileData({
-          fullName: '',
           username: '',
           email: '',
           phone: '',
-          bio: ''
-        });
 
+        });
         setProfileImage('');
+        setAvatarStyle('avataaars');
         return;
       }
 
-      const accountEmail = String(user.email || '')
+      const response = await fetch(
+        `${API_URL}/api/auth/my-profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Unable to load profile from MongoDB.');
+      }
+
+      const result = await response.json();
+      const savedUser = result.user;
+
+      if (!savedUser || cancelled) return;
+
+      const email = String(savedUser.email || user.email || '')
         .trim()
         .toLowerCase();
 
-      // Each account has its own saved profile
-      const profileKey = accountEmail
-        ? `skillLinkProfile:${accountEmail}`
-        : '';
-
-      const savedProfile = profileKey
-        ? JSON.parse(localStorage.getItem(profileKey) || '{}')
-        : {};
+      const currentProfile = {
+        username: savedUser.username || '',
+        email,
+        phone: savedUser.phoneNumber || '',
+        profileImage: savedUser.profileImage || '',
+        avatarStyle:
+          savedUser.avatarStyle && savedUser.avatarStyle !== 'default'
+            ? savedUser.avatarStyle
+            : 'avataaars'
+      };
 
       setProfileData({
-        fullName:
-          savedProfile.fullName ??
-          user.fullName ??
-          user.full_name ??
-          user.name ??
-          '',
+        username: currentProfile.username,
+        email: currentProfile.email,
+        phone: currentProfile.phone,
 
-        username:
-          savedProfile.username ??
-          user.username ??
-          user.userName ??
-          '',
-
-        email: accountEmail,
-
-        phone: savedProfile.phone ?? '',
-
-        bio: savedProfile.bio ?? ''
       });
 
-      setProfileImage(savedProfile.profileImage || '');
+      setProfileImage(currentProfile.profileImage);
+      setAvatarStyle(currentProfile.avatarStyle);
 
-      // Load saved visibility preference
-      if (accountEmail) {
-        const savedVisibility = localStorage.getItem(
-          `skillLinkVisibility:${accountEmail}`
-        );
-
-        if (savedVisibility === 'public' || savedVisibility === 'private') {
-          setVisibility(savedVisibility);
-        }
-      }
+      localStorage.setItem(
+        `skillLinkProfile:${email}`,
+        JSON.stringify(currentProfile)
+      );
     } catch (error) {
       console.error('Failed to load profile:', error);
+
+      if (!cancelled) {
+        alert('Unable to load your saved profile. Please try again.');
+      }
     } finally {
-      setProfileLoading(false);
+      if (!cancelled) {
+        setProfileLoading(false);
+      }
     }
-  }, []);
+  };
 
-  // Sidebar Items
+  loadProfile();
+
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
+
   const menuItems = [
-    {
-      id: 'profile',
-      label: 'Profile Information',
-      sub: 'Manage your personal details',
-      icon: '👤'
-    },
-    {
-      id: 'visibility',
-      label: 'Profile Visibility',
-      sub: 'Control who can view your profile',
-      icon: '👁️'
-    },
-    {
-      id: 'privacy',
-      label: 'Privacy & Security',
-      sub: 'Password and account security',
-      icon: '🛡️'
-    },
-    {
-      id: 'appearance',
-      label: 'Appearance',
-      sub: 'Customize your experience',
-      icon: '🎨'
-    },
-    {
-      id: 'help',
-      label: 'Help & Support',
-      sub: 'Get help with SkillLink',
-      icon: '❓'
-    },
-    {
-      id: 'logout',
-      label: 'Log Out',
-      sub: 'Sign out of your account',
-      icon: '↳'
-    }
-  ];
+  {
+    id: 'profile',
+    label: 'Profile Information',
+    sub: 'Manage your personal details',
+    icon: <SettingsIcon type="user" />
+  },
+  {
+    id: 'privacy',
+    label: 'Privacy & Security',
+    sub: 'Password and account security',
+    icon: <SettingsIcon type="shield" />
+  },
+  {
+    id: 'help',
+    label: 'Help & Support',
+    sub: 'Get help with SkillLink',
+    icon: <SettingsIcon type="help" />
+  }
+];
 
-  // FAQs
   const faqs = [
     {
       q: 'How do I edit my profile information?',
-      a: 'Go to Settings > Profile Information tab. You can update your name, username, bio, and profile photo directly from there.'
+      a: 'Go to Settings > Profile Information. You can update your username, phone number, and profile photo.'
     },
     {
       q: 'How does SkillLink matching work?',
       a: 'SkillLink matches you with other users based on shared hobbies, skills you want to learn, and skills you can offer.'
     },
     {
-      q: 'Is my account private?',
-      a: 'You can control your privacy under Settings > Profile Visibility. Switch to Private Profile if you only want approved connections to view your details.'
-    },
-    {
       q: 'How do I reset my password?',
-      a: 'Under Settings > Privacy & Security, click on Change Password to update your security credentials.'
-    }
+      a: 'Under Settings > Privacy & Security, click on Change Password to update your password using the existing verification flow.'
+    },
+
   ];
 
-  // Menu Switcher
-  const handleMenuClick = (itemId) => {
-    if (itemId === 'logout') {
-      if (window.confirm('Are you sure you want to log out?')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+ const handleMenuClick = (itemId) => {
+  setActiveTab(itemId);
+  sessionStorage.setItem('skilllinkSettingsTab', itemId);
 
-        navigate('/login', { replace: true });
-      }
-    } else {
-      setActiveTab(itemId);
-
-      if (itemId === 'help') {
-        setHelpSubView('menu');
-      }
+    if (itemId === 'help') {
+      setHelpSubView('menu');
     }
   };
 
-  // Handle profile field changes
   const handleProfileChange = (field, value) => {
     setProfileData((prev) => ({
       ...prev,
@@ -219,7 +305,6 @@ function Settings() {
     setProfileSaved(false);
   };
 
-  // Handle profile photo
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
 
@@ -251,163 +336,162 @@ function Settings() {
     reader.readAsDataURL(file);
   };
 
-  // Save and validate profile
-  const handleProfileSave = (e) => {
-    e.preventDefault();
+  const handleRemoveImage = () => {
+    setProfileImage('');
+    setProfileSaved(false);
 
-    const errors = {};
+    const input = document.getElementById('photo-upload');
 
-    const fullName = profileData.fullName.trim();
-    const username = profileData.username.trim();
-    const email = profileData.email.trim().toLowerCase();
-    const phone = profileData.phone.trim();
-    const bio = profileData.bio.trim();
-
-    // Full Name
-    if (!fullName) {
-      errors.fullName = 'Full name is required.';
-    } else if (fullName.length < 2) {
-      errors.fullName = 'Full name must be at least 2 characters.';
-    } else if (fullName.length > 100) {
-      errors.fullName = 'Full name must not exceed 100 characters.';
+    if (input) {
+      input.value = '';
     }
+  };
 
-    // Username
-    if (!username) {
-      errors.username = 'Username is required.';
-    } else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-      errors.username =
-        'Username must be 3–20 characters using letters, numbers, or underscores.';
+  const handleProfileSave = async (e) => {
+  e.preventDefault();
+
+  const errors = {};
+
+  const username = profileData.username.trim();
+  const email = profileData.email.trim().toLowerCase();
+  const phone = profileData.phone.trim();
+
+
+  if (!username) {
+    errors.username = 'Username is required.';
+  } else if (!/^[a-zA-Z0-9_]{3,8}$/.test(username)) {
+  errors.username =
+    'Username must be 3–8 characters using letters, numbers, or underscores.';
+}
+
+  if (!email) {
+    errors.email = 'Email address is required.';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Please enter a valid email address.';
+  }
+
+  if (phone && !/^9\d{9}$/.test(phone)) {
+  errors.phone = 'Enter 10 digits starting with 9.';
+}
+
+  setProfileErrors(errors);
+
+  if (Object.keys(errors).length > 0) {
+    setProfileSaved(false);
+    return;
+  }
+
+  const user = getLoggedInUser();
+  const token = localStorage.getItem('token');
+
+  if (!user || !user.email || !token) {
+    alert('Your account session was not found. Please log in again.');
+    navigate('/login');
+    return;
+  }
+
+  try {
+    setProfileLoading(true);
+    setProfileSaved(false);
+
+    const response = await fetch(
+      `${API_URL}/api/auth/update-profile`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          username,
+          phoneNumber: phone,
+
+          profileImage,
+          avatarStyle
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || 'Unable to update your profile.'
+      );
     }
-
-    // Email
-    if (!email) {
-      errors.email = 'Email address is required.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Please enter a valid email address.';
-    }
-
-    // Optional phone number
-    if (phone && !/^\+?[0-9\s\-()]{7,20}$/.test(phone)) {
-      errors.phone = 'Please enter a valid phone number.';
-    }
-
-    // Optional bio
-    if (bio.length > 250) {
-      errors.bio = 'Bio must not exceed 250 characters.';
-    }
-
-    setProfileErrors(errors);
-
-    if (Object.keys(errors).length > 0) {
-      setProfileSaved(false);
-      return;
-    }
-
-    const user = getLoggedInUser();
-
-    if (!user || !user.email) {
-      alert('Your account session was not found. Please log in again.');
-      navigate('/login');
-      return;
-    }
-
-    const accountEmail = String(user.email).trim().toLowerCase();
 
     const updatedProfile = {
-      fullName,
       username,
-      email: accountEmail,
+      email,
       phone,
-      bio,
-      profileImage
+
+      profileImage,
+      avatarStyle
     };
 
-    try {
-      // Save profile under the currently logged-in account
-      const profileKey = `skillLinkProfile:${accountEmail}`;
+    localStorage.setItem(
+      `skillLinkProfile:${email}`,
+      JSON.stringify(updatedProfile)
+    );
 
+    const originalStoredUser = JSON.parse(
+      localStorage.getItem('user') || '{}'
+    );
+
+    const currentUser = originalStoredUser.user
+      ? originalStoredUser.user
+      : originalStoredUser;
+
+    const updatedUser = {
+      ...currentUser,
+      ...(result.user || {}),
+      username,
+      phoneNumber: phone,
+
+      profileImage,
+      avatarStyle
+    };
+
+    if (originalStoredUser.user) {
       localStorage.setItem(
-        profileKey,
-        JSON.stringify(updatedProfile)
+        'user',
+        JSON.stringify({
+          ...originalStoredUser,
+          user: updatedUser
+        })
       );
-
-      // Update locally stored user information
-      const originalStoredUser = JSON.parse(
-        localStorage.getItem('user') || '{}'
-      );
-
-      if (originalStoredUser.user) {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            ...originalStoredUser,
-            user: {
-              ...originalStoredUser.user,
-              fullName,
-              username
-            }
-          })
-        );
-      } else {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            ...originalStoredUser,
-            fullName,
-            username
-          })
-        );
-      }
-
-      setProfileData({
-        fullName,
-        username,
-        email: accountEmail,
-        phone,
-        bio
-      });
-
-      setProfileErrors({});
-      setProfileSaved(true);
-
-      setTimeout(() => {
-        setProfileSaved(false);
-      }, 3000);
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-      alert('Unable to save your profile. Please try again.');
-    }
-  };
-
-  // Save profile visibility
-  const handleVisibilitySave = () => {
-    const user = getLoggedInUser();
-    const email = String(user?.email || '').trim().toLowerCase();
-
-    if (!email) {
-      alert('Please log in to save your preferences.');
-      return;
-    }
-
-    try {
+    } else {
       localStorage.setItem(
-        `skillLinkVisibility:${email}`,
-        visibility
+        'user',
+        JSON.stringify(updatedUser)
       );
-
-      setVisibilitySaved(true);
-
-      setTimeout(() => {
-        setVisibilitySaved(false);
-      }, 3000);
-    } catch (error) {
-      console.error('Failed to save visibility:', error);
-      alert('Unable to save your visibility preference.');
     }
-  };
 
-  // Help & Support submit
+    setProfileData((prev) => ({
+      ...prev,
+      username,
+      email,
+      phone,
+
+    }));
+
+    setProfileErrors({});
+    setProfileSaved(true);
+
+    window.dispatchEvent(
+      new Event('skilllink-profile-updated')
+    );
+
+    setTimeout(() => {
+      setProfileSaved(false);
+    }, 3000);
+  } catch (error) {
+    console.error('Failed to save profile:', error);
+    alert(error.message || 'Unable to save your profile. Please try again.');
+  } finally {
+    setProfileLoading(false);
+  }
+};
   const handleSupportSubmit = (e) => {
     e.preventDefault();
 
@@ -420,20 +504,18 @@ function Settings() {
   };
 
   return (
-    <div className={`settings-page-wrapper theme-${theme}`}>
-      {/* HEADER */}
+    <div className="settings-page-wrapper theme-dark">
       <div className="settings-header">
         <span className="settings-badge">MANAGE YOUR ACCOUNT</span>
 
         <h1 className="settings-title">Settings</h1>
 
         <p className="settings-subtitle">
-          Manage your SkillLink profile, privacy, security, and preferences.
+          Manage your SkillLink profile, privacy, and security.
         </p>
       </div>
 
       <div className="settings-container">
-        {/* SIDEBAR */}
         <div className="settings-sidebar-menu">
           {menuItems.map((item) => (
             <div
@@ -442,6 +524,13 @@ function Settings() {
                 activeTab === item.id ? 'active' : ''
               }`}
               onClick={() => handleMenuClick(item.id)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleMenuClick(item.id);
+                }
+              }}
             >
               <div className="menu-icon-box">{item.icon}</div>
 
@@ -455,10 +544,7 @@ function Settings() {
           ))}
         </div>
 
-        {/* CONTENT PANEL */}
         <div className="settings-content-panel">
-
-          {/* TAB 1: PROFILE INFORMATION */}
           {activeTab === 'profile' && (
             <div className="panel-section">
               <span className="panel-badge">YOUR PROFILE</span>
@@ -466,7 +552,7 @@ function Settings() {
               <h2 className="panel-title">Profile Information</h2>
 
               <p className="panel-subtitle">
-                Update your personal information and profile details.
+                Manage how other SkillLink members see you.
               </p>
 
               {profileLoading && (
@@ -488,35 +574,52 @@ function Settings() {
               )}
 
               <form onSubmit={handleProfileSave}>
-                {/* PROFILE PHOTO */}
                 <div className="profile-photo-section">
-                  <div className="avatar-circle">
-                    {profileImage ? (
+                    <div className="avatar-circle">
                       <img
-                        src={profileImage}
-                        alt="Profile"
+                        src={
+                          profileImage ||
+                          `https://api.dicebear.com/7.x/${avatarStyle}/svg?seed=${encodeURIComponent(
+                            profileData.username || profileData.email || 'User'
+                          )}`
+                        }
+                        alt="Profile Avatar"
                         className="avatar-img"
                       />
-                    ) : (
-                      profileData.fullName
-                        ? profileData.fullName.charAt(0).toUpperCase()
-                        : '?'
-                    )}
-                  </div>
+                    </div>
+
 
                   <div className="photo-info">
                     <h3>Profile Photo</h3>
 
                     <p>
-                      Add a photo to help other SkillLink users recognize you.
+                      Make your profile recognizable to other SkillLink users.
                     </p>
 
-                    <label
-                      htmlFor="photo-upload"
-                      className="btn-secondary custom-upload-btn"
-                    >
-                      📷 Change Photo
-                    </label>
+                    <div className="photo-actions">
+                      <label
+                        htmlFor="photo-upload"
+                        className="btn-secondary custom-upload-btn"
+                      >
+<SettingsIcon type="camera" size={18} />
+<span>Change Photo</span>
+                      </label>
+
+                      {profileImage && (
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          onClick={handleRemoveImage}
+                        >
+                         <SettingsIcon type="trash" size={18} />
+                        <span>Remove Photo</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <small>
+                      JPG, PNG, or other image formats, up to 2 MB.
+                    </small>
 
                     <input
                       id="photo-upload"
@@ -528,30 +631,8 @@ function Settings() {
                   </div>
                 </div>
 
-                {/* PROFILE FIELDS */}
                 <div className="form-grid">
-                  <div className="form-group">
-                    <label>Full Name</label>
-
-                    <input
-                      type="text"
-                      value={profileData.fullName}
-                      onChange={(e) =>
-                        handleProfileChange('fullName', e.target.value)
-                      }
-                      placeholder="Enter your full name"
-                      maxLength={100}
-                      required
-                    />
-
-                    {profileErrors.fullName && (
-                      <span className="field-error-text">
-                        {profileErrors.fullName}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="form-group">
+                  <div className="form-group full-width">
                     <label>Username</label>
 
                     <input
@@ -561,7 +642,7 @@ function Settings() {
                         handleProfileChange('username', e.target.value)
                       }
                       placeholder="Enter your username"
-                      maxLength={20}
+                      maxLength={8}
                       required
                     />
 
@@ -596,14 +677,26 @@ function Settings() {
                     <label>Phone Number</label>
 
                     <input
-                      type="tel"
-                      value={profileData.phone}
-                      onChange={(e) =>
-                        handleProfileChange('phone', e.target.value)
-                      }
-                      placeholder="Add phone number"
-                      maxLength={20}
-                    />
+  type="tel"
+  value={
+    profileData.phone
+      ? `+63 ${profileData.phone.replace(/^\+?63|^0/, '')}`
+      : '+63 '
+  }
+  onChange={(e) => {
+    const digits = e.target.value.replace(/\D/g, '');
+
+    const localNumber = digits.startsWith('63')
+      ? digits.slice(2)
+      : digits.startsWith('0')
+        ? digits.slice(1)
+        : digits;
+
+    handleProfileChange('phone', localNumber.slice(0, 10));
+  }}
+  placeholder="+63 9XXXXXXXXX"
+  maxLength={14}
+/>
 
                     {profileErrors.phone && (
                       <span className="field-error-text">
@@ -612,29 +705,7 @@ function Settings() {
                     )}
                   </div>
 
-                  <div className="form-group full-width">
-                    <label>Bio</label>
 
-                    <textarea
-                      rows="3"
-                      value={profileData.bio}
-                      onChange={(e) =>
-                        handleProfileChange('bio', e.target.value)
-                      }
-                      placeholder="Tell other users a little about yourself"
-                      maxLength={250}
-                    />
-
-                    <small>
-                      {profileData.bio.length}/250 characters
-                    </small>
-
-                    {profileErrors.bio && (
-                      <span className="field-error-text">
-                        {profileErrors.bio}
-                      </span>
-                    )}
-                  </div>
                 </div>
 
                 <div className="panel-actions">
@@ -643,98 +714,14 @@ function Settings() {
                     className="btn-primary"
                     disabled={profileLoading || !profileData.email}
                   >
-                    Save Changes
+                    <SettingsIcon type="save" size={18} />
+<span>Save Changes</span>
                   </button>
                 </div>
               </form>
             </div>
           )}
 
-          {/* TAB 2: PROFILE VISIBILITY */}
-          {activeTab === 'visibility' && (
-            <div className="panel-section">
-              <span className="panel-badge">PROFILE PRIVACY</span>
-
-              <h2 className="panel-title">Profile Visibility</h2>
-
-              <p className="panel-subtitle">
-                Choose how other SkillLink users can discover and view your profile.
-              </p>
-
-              {visibilitySaved && (
-                <div className="alert-banner success">
-                  ✅ Profile visibility preference saved!
-                </div>
-              )}
-
-              <div className="visibility-options">
-                <div
-                  className={`visibility-card ${
-                    visibility === 'public' ? 'selected' : ''
-                  }`}
-                  onClick={() => setVisibility('public')}
-                >
-                  <div className="card-header-row">
-                    <span className="vis-icon">👁️</span>
-
-                    <input
-                      type="radio"
-                      name="visibility"
-                      checked={visibility === 'public'}
-                      readOnly
-                    />
-                  </div>
-
-                  <h3>Public Profile</h3>
-
-                  <p>
-                    Other SkillLink users can discover your profile, hobbies,
-                    skills, and portfolio.
-                  </p>
-                </div>
-
-                <div
-                  className={`visibility-card ${
-                    visibility === 'private' ? 'selected' : ''
-                  }`}
-                  onClick={() => setVisibility('private')}
-                >
-                  <div className="card-header-row">
-                    <span className="vis-icon">🔒</span>
-
-                    <input
-                      type="radio"
-                      name="visibility"
-                      checked={visibility === 'private'}
-                      readOnly
-                    />
-                  </div>
-
-                  <h3>Private Profile</h3>
-
-                  <p>
-                    Your profile information is limited to approved connections only.
-                  </p>
-                </div>
-              </div>
-
-              <div className="info-banner">
-                <span>ℹ️</span> You can change your profile visibility anytime
-                from your settings.
-              </div>
-
-              <div className="panel-actions">
-                <button
-                  className="btn-primary"
-                  onClick={handleVisibilitySave}
-                >
-                  Save Visibility
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: PRIVACY & SECURITY */}
           {activeTab === 'privacy' && (
             <div className="panel-section">
               <span className="panel-badge">ACCOUNT PROTECTION</span>
@@ -742,19 +729,15 @@ function Settings() {
               <h2 className="panel-title">Privacy & Security</h2>
 
               <p className="panel-subtitle">
-                Manage your password and account security.
+                Keep your account safe and manage your privacy.
               </p>
-
-              {privacyAlert && (
-                <div className="alert-banner success">
-                  {privacyAlert}
-                </div>
-              )}
 
               <div className="setting-card-list">
                 <div className="setting-card-item">
                   <div className="card-left">
-                    <span className="card-icon">🔑</span>
+                    <span className="card-icon">
+                    <SettingsIcon type="key" />
+                  </span>
 
                     <div>
                       <div className="card-title">Change Password</div>
@@ -766,11 +749,16 @@ function Settings() {
                   </div>
 
                   <button
+                    type="button"
                     className="btn-setting-action"
                     onClick={() =>
                       navigate('/change-password', {
-                        state: { email: profileData.email }
-                      })
+  state: {
+    email: profileData.email,
+    returnTo: '/dashboard',
+    settingsTab: 'privacy'
+  }
+})
                     }
                   >
                     Change
@@ -779,105 +767,53 @@ function Settings() {
 
                 <div className="setting-card-item">
                   <div className="card-left">
-                    <span className="card-icon">✉️</span>
+                    <span className="card-icon">
+  <SettingsIcon type="mail" />
+</span>
 
                     <div>
                       <div className="card-title">Email Verification</div>
 
                       <div className="card-desc">
-                        Your email address is used to verify your SkillLink account.
+                        Your email is used to verify your SkillLink account.
                       </div>
                     </div>
                   </div>
 
                   <button
+                    type="button"
                     className="btn-setting-status verified"
                     disabled
                   >
-                    Verified
+                    ✓ Verified
                   </button>
                 </div>
 
+
                 <div className="setting-card-item">
                   <div className="card-left">
-                    <span className="card-icon">📱</span>
+                    <span className="card-icon">
+  <SettingsIcon type="shield" />
+</span>
 
                     <div>
                       <div className="card-title">Login Security</div>
 
                       <div className="card-desc">
-                        SkillLink sends a verification code when signing in.
+                        SkillLink uses email OTP verification when you sign in.
+                        Never share your verification code with anyone.
                       </div>
                     </div>
                   </div>
 
-                  <button
-                    className="btn-setting-status protect"
-                    onClick={() =>
-                      alert('Two-Factor Authentication settings enabled!')
-                    }
-                  >
-                    Protect
-                  </button>
+                  <span className="btn-setting-status protect">
+                    OTP Enabled
+                  </span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 4: APPEARANCE */}
-          {activeTab === 'appearance' && (
-            <div className="panel-section">
-              <span className="panel-badge">PERSONALIZATION</span>
-
-              <h2 className="panel-title">Appearance</h2>
-
-              <p className="panel-subtitle">
-                Choose how you want SkillLink to look.
-              </p>
-
-              <div className="theme-grid">
-                <div
-                  className={`theme-card ${
-                    theme === 'light' ? 'selected' : ''
-                  }`}
-                  onClick={() => setTheme('light')}
-                >
-                  <span className="theme-icon">☀️</span>
-                  <h3>Light</h3>
-                  <p>Light interface</p>
-                </div>
-
-                <div
-                  className={`theme-card ${
-                    theme === 'dark' ? 'selected' : ''
-                  }`}
-                  onClick={() => setTheme('dark')}
-                >
-                  <span className="theme-icon">🌙</span>
-                  <h3>Dark</h3>
-                  <p>Dark interface</p>
-                </div>
-
-                <div
-                  className={`theme-card ${
-                    theme === 'system' ? 'selected' : ''
-                  }`}
-                  onClick={() => setTheme('system')}
-                >
-                  <span className="theme-icon">💻</span>
-                  <h3>System</h3>
-                  <p>Use device setting</p>
-                </div>
-              </div>
-
-              <div className="info-banner">
-                <span>🎨</span> Selected theme:{' '}
-                <strong>{theme.toUpperCase()}</strong> mode is now active.
-              </div>
-            </div>
-          )}
-
-          {/* TAB 5: HELP & SUPPORT */}
           {activeTab === 'help' && (
             <div className="panel-section">
               <div className="section-top-bar">
@@ -893,6 +829,7 @@ function Settings() {
 
                 {helpSubView !== 'menu' && (
                   <button
+                    type="button"
                     className="btn-back"
                     onClick={() => setHelpSubView('menu')}
                   >
@@ -901,15 +838,23 @@ function Settings() {
                 )}
               </div>
 
-              {/* Help menu */}
               {helpSubView === 'menu' && (
                 <div className="setting-card-list">
                   <div
                     className="setting-card-item clickable"
                     onClick={() => setHelpSubView('faq')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setHelpSubView('faq');
+                      }
+                    }}
                   >
                     <div className="card-left">
-                      <span className="card-icon">📑</span>
+                      <span className="card-icon">
+  <SettingsIcon type="faq" />
+</span>
 
                       <div>
                         <div className="card-title">
@@ -928,9 +873,18 @@ function Settings() {
                   <div
                     className="setting-card-item clickable"
                     onClick={() => setHelpSubView('contact')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setHelpSubView('contact');
+                      }
+                    }}
                   >
                     <div className="card-left">
-                      <span className="card-icon">💬</span>
+                      <span className="card-icon">
+  <SettingsIcon type="message" />
+</span>
 
                       <div>
                         <div className="card-title">Contact Support</div>
@@ -947,9 +901,18 @@ function Settings() {
                   <div
                     className="setting-card-item clickable"
                     onClick={() => setHelpSubView('report')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setHelpSubView('report');
+                      }
+                    }}
                   >
                     <div className="card-left">
-                      <span className="card-icon">⚠️</span>
+                     <span className="card-icon">
+  <SettingsIcon type="warning" />
+</span>
 
                       <div>
                         <div className="card-title">Report a Problem</div>
@@ -965,7 +928,6 @@ function Settings() {
                 </div>
               )}
 
-              {/* FAQs */}
               {helpSubView === 'faq' && (
                 <div className="faq-list">
                   {faqs.map((faq, index) => (
@@ -977,6 +939,13 @@ function Settings() {
                       onClick={() =>
                         setOpenFaq(openFaq === index ? null : index)
                       }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          setOpenFaq(openFaq === index ? null : index);
+                        }
+                      }}
                     >
                       <div className="faq-question">
                         <span>{faq.q}</span>
@@ -994,7 +963,6 @@ function Settings() {
                 </div>
               )}
 
-              {/* Contact Support */}
               {helpSubView === 'contact' && (
                 <div className="support-form-container">
                   {ticketSubmitted ? (
@@ -1023,7 +991,7 @@ function Settings() {
                           <option value="general">General Inquiry</option>
                           <option value="account">Account & Login</option>
                           <option value="matching">
-                            Matchings & Portfolio
+                            Matching & Portfolio
                           </option>
                         </select>
                       </div>
@@ -1048,7 +1016,6 @@ function Settings() {
                 </div>
               )}
 
-              {/* Report a Problem */}
               {helpSubView === 'report' && (
                 <div className="support-form-container">
                   {ticketSubmitted ? (
@@ -1065,7 +1032,7 @@ function Settings() {
 
                         <input
                           type="text"
-                          placeholder="e.g. Layout glitch on profile page"
+                          placeholder="e.g. Layout issue on profile page"
                           required
                         />
                       </div>
@@ -1091,7 +1058,6 @@ function Settings() {
               )}
             </div>
           )}
-
         </div>
       </div>
     </div>

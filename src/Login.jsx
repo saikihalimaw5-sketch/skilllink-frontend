@@ -4,6 +4,10 @@ import axios from 'axios';
 import './Login.css';
 
 const OTP_DURATION = 180; // 3 minutes
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
 
 function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
   const navigate = useNavigate();
@@ -116,7 +120,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/login',
+        `${API_URL}/api/auth/login`,
         {
           email: formData.email.trim(),
           password: formData.password
@@ -167,7 +171,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/verify-otp',
+        `${API_URL}/api/auth/verify-otp`,
         {
           email: formData.email.trim(),
           otp: otp.trim()
@@ -210,7 +214,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/resend-otp',
+        `${API_URL}/api/auth/resend-otp`,
         {
           email: formData.email.trim()
         }
@@ -254,7 +258,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/forgot-password',
+        `${API_URL}/api/auth/forgot-password`,
         {
           email: resetEmail.trim()
         }
@@ -320,7 +324,7 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/reset-password',
+        `${API_URL}/api/auth/reset-password`,
         {
           email: resetEmail.trim(),
           otp: resetOtp.trim(),

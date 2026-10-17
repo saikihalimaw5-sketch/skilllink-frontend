@@ -1,59 +1,68 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './Notifications.css';
 
-const API_URL = 'http://localhost:5000';
-const SOCKET_URL = 'http://localhost:5000';
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
+
+const normalizeStatus = (status) => {
+  const value = String(status || '').toLowerCase();
+
+  if (['accepted', 'accept'].includes(value)) return 'accepted';
+  if (['declined', 'rejected', 'reject'].includes(value)) return 'declined';
+
+  return value || 'pending';
+};
+
+const getId = (value) => {
+  if (!value) return '';
+  if (typeof value === 'object') {
+    return String(value._id || value.id || value.userId || '');
+  }
+  return String(value);
+};
 
 function Notifications() {
   const navigate = useNavigate();
 
-  // LOGGED IN USER DATA
-  const loggedInUser = (() => {
+  const [activeTab, setActiveTab] = useState('All');
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [processingIds, setProcessingIds] = useState([]);
+  const [deletingId, setDeletingId] = useState('');
+  const [deletingAll, setDeletingAll] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [notificationToDelete, setNotificationToDelete] = useState(null);
+  const [deleteAllMode, setDeleteAllMode] = useState(false);
+
+  const [user] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('user') || '{}');
     } catch {
       return {};
     }
-  })();
+  });
 
-  const userId = String(
-    loggedInUser._id ||
-      loggedInUser.id ||
-      loggedInUser.userId ||
-      ''
-  );
-
+  const userId = getId(user._id || user.id || user.userId);
   const token = localStorage.getItem('token') || '';
 
-  // STATES
-  const [activeTab, setActiveTab] = useState('All');
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [deletingId, setDeletingId] = useState('');
-  const [deletingAll, setDeletingAll] = useState(false);
-
-  // API HEADERS
   const getHeaders = useCallback(
-    (includeContentType = false) => {
+    (json = false) => {
       const headers = {};
 
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
-      if (includeContentType) {
-        headers['Content-Type'] = 'application/json';
-      }
+      if (token) headers.Authorization = `Bearer ${token}`;
+      if (json) headers['Content-Type'] = 'application/json';
 
       return headers;
     },
     [token]
   );
 
-  // FETCH NOTIFICATIONS
   const fetchNotifications = useCallback(
     async (showLoading = false) => {
       if (!userId || !token) {
@@ -64,47 +73,41 @@ function Notifications() {
       }
 
       try {
-        if (showLoading) {
-          setLoading(true);
-        }
+        if (showLoading) setLoading(true);
 
         const response = await fetch(
           `${API_URL}/api/notifications/${encodeURIComponent(userId)}`,
-          {
-            method: 'GET',
-            headers: getHeaders(),
-          }
+          { headers: getHeaders() }
         );
 
-        const data = await response.json().catch(() => null);
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          throw new Error(
-            data?.message ||
-              `Failed to load notifications (${response.status}).`
-          );
+          throw new Error(data.message || 'Failed to load notifications.');
         }
 
         if (!Array.isArray(data)) {
-          throw new Error(
-            'Invalid notifications response from server.'
-          );
+          throw new Error('Invalid notifications response.');
         }
 
         setNotifications(
-          [...data].sort(
-            (a, b) =>
-              new Date(b.createdAt || 0).getTime() -
-              new Date(a.createdAt || 0).getTime()
-          )
+          data
+            .map((item) => ({
+              ...item,
+              status: normalizeStatus(item.status),
+              isRead: Boolean(item.isRead),
+            }))
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt || 0).getTime() -
+                new Date(a.createdAt || 0).getTime()
+            )
         );
 
         setError('');
       } catch (err) {
-        console.error('Error loading notifications:', err);
-        setError(
-          err.message || 'Unable to load notifications.'
-        );
+        console.error('Fetch notifications error:', err);
+        setError(err.message || 'Unable to load notifications.');
       } finally {
         setLoading(false);
       }
@@ -112,114 +115,119 @@ function Notifications() {
     [userId, token, getHeaders]
   );
 
-  // SOCKET.IO REALTIME UPDATES + POLLING
+  // Initial load, Socket.IO and periodic refresh
   useEffect(() => {
     if (!userId || !token) {
-      setNotifications([]);
       setLoading(false);
       setError('Please log in to view your notifications.');
-      return;
+      return undefined;
     }
-
-    let isMounted = true;
 
     fetchNotifications(true);
 
-    const socket = io(SOCKET_URL, {
+    const socket = io(API_URL, {
       auth: { token },
       transports: ['websocket', 'polling'],
     });
 
-    socket.on('connect', () => {
-      console.log(
-        'Connected to notification server:',
-        socket.id
-      );
-    });
-
-    socket.on('connect_error', (err) => {
-      console.error(
-        'Notification socket connection error:',
-        err.message
-      );
-    });
-
-    socket.on('new_notification', (newNotification) => {
-      if (!isMounted || !newNotification?._id) {
-        return;
-      }
+    socket.on('new_notification', (incoming) => {
+      if (!incoming?._id) return;
 
       setNotifications((previous) => {
-        const notificationId = String(newNotification._id);
-
-        const alreadyExists = previous.some(
-          (notification) =>
-            String(notification._id) === notificationId
+        const exists = previous.some(
+          (item) => getId(item._id) === getId(incoming._id)
         );
 
-        if (alreadyExists) {
-          return previous.map((notification) =>
-            String(notification._id) === notificationId
-              ? { ...notification, ...newNotification }
-              : notification
+        if (exists) {
+          return previous.map((item) =>
+            getId(item._id) === getId(incoming._id)
+              ? { ...item, ...incoming }
+              : item
           );
         }
 
-        return [newNotification, ...previous];
+        return [
+          { ...incoming, status: normalizeStatus(incoming.status) },
+          ...previous,
+        ];
       });
     });
 
     const interval = setInterval(() => {
       fetchNotifications(false);
-    }, 5000);
+    }, 10000);
 
     return () => {
-      isMounted = false;
       clearInterval(interval);
-
       socket.off('new_notification');
-      socket.off('connect');
-      socket.off('connect_error');
       socket.disconnect();
     };
   }, [userId, token, fetchNotifications]);
 
-  // OPEN MESSAGE CONVERSATION
-  const handleNotificationClick = (notification) => {
-    if (notification.type !== 'Message') {
-      return;
-    }
+  // Mark one notification as read
+  const handleMarkAsRead = async (notification) => {
+    const id = getId(notification?._id);
 
-    const senderId =
-      typeof notification.senderId === 'object'
-        ? notification.senderId?._id ||
-          notification.senderId?.id ||
-          notification.senderId?.userId ||
-          ''
-        : notification.senderId;
+    if (!id || notification.isRead || !token) return;
+
+    // Immediately remove unread highlight and dot.
+    setNotifications((previous) =>
+      previous.map((item) =>
+        getId(item._id) === id ? { ...item, isRead: true } : item
+      )
+    );
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/notifications/${encodeURIComponent(id)}/read`,
+        {
+          method: 'PATCH',
+          headers: getHeaders(),
+        }
+      );
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || 'Could not save read status. Check your backend route.'
+        );
+      }
+    } catch (err) {
+      console.error('Mark as read error:', err);
+
+      // Restore unread status if the backend did not save it.
+      setNotifications((previous) =>
+        previous.map((item) =>
+          getId(item._id) === id ? { ...item, isRead: false } : item
+        )
+      );
+
+      setError(err.message || 'Failed to mark as read.');
+    }
+  };
+
+  // Open a message notification
+  const handleNotificationClick = (notification) => {
+    if (notification.type !== 'Message') return;
+
+    const senderId = getId(notification.senderId);
 
     if (!senderId) {
-      setError(
-        'Unable to open this conversation. Sender information is missing.'
-      );
+      setError('Unable to open conversation: sender was not found.');
       return;
     }
 
     navigate('/dashboard', {
       state: {
         activeTab: 'Message',
-        openChatUserId: String(senderId),
+        openChatUserId: senderId,
       },
     });
   };
 
-  // MARK ALL AS READ
+  // Mark all as read
   const handleMarkAllRead = async () => {
-    if (!userId || !token) {
-      setError('Please log in again.');
-      return;
-    }
-
     try {
       const response = await fetch(
         `${API_URL}/api/notifications/mark-all-read/${encodeURIComponent(userId)}`,
@@ -232,59 +240,102 @@ function Notifications() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          data.message ||
-            `Failed to mark notifications as read (${response.status}).`
-        );
+        throw new Error(data.message || 'Failed to mark all as read.');
       }
 
       setNotifications((previous) =>
-        previous.map((notification) => ({
-          ...notification,
-          isRead: true,
-        }))
+        previous.map((item) => ({ ...item, isRead: true }))
       );
 
       setError('');
     } catch (err) {
-      console.error('Error marking notifications as read:', err);
-      setError(
-        err.message || 'Failed to mark notifications as read.'
-      );
+      console.error(err);
+      setError(err.message || 'Unable to mark all as read.');
     }
   };
 
-  // HIDE ONE NOTIFICATION FOR ME
-  const handleDeleteNotification = async (notification, event) => {
+
+  // Open the confirmation popup for one notification.
+  const handleDeleteNotification = (notification, event) => {
     event?.preventDefault();
     event?.stopPropagation();
 
-    const notificationId = notification?._id;
+    const id = getId(notification?._id);
 
-    if (
-      !notificationId ||
-      !userId ||
-      !token ||
-      deletingId ||
-      deletingAll
-    ) {
+    if (!id || deletingId || deletingAll) return;
+
+    setNotificationToDelete(notification);
+    setDeleteAllMode(false);
+    setShowDeleteModal(true);
+  };
+
+  // Open the confirmation popup for all notifications.
+  const handleDeleteAll = () => {
+    if (deletingAll || deletingId || !notifications.length) return;
+
+    setNotificationToDelete(null);
+    setDeleteAllMode(true);
+    setShowDeleteModal(true);
+  };
+
+  // Cancel the deletion.
+  const cancelDeleteNotification = () => {
+    if (deletingId || deletingAll) return;
+
+    setShowDeleteModal(false);
+    setNotificationToDelete(null);
+    setDeleteAllMode(false);
+  };
+
+  // Confirm and perform the selected deletion.
+  const confirmDeleteNotification = async () => {
+    if (deletingId || deletingAll) return;
+
+    setError('');
+
+    if (deleteAllMode) {
+      try {
+        setDeletingAll(true);
+
+        const response = await fetch(
+          `${API_URL}/api/notifications/hide-all`,
+          {
+            method: 'PATCH',
+            headers: getHeaders(),
+          }
+        );
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || 'Failed to hide notifications.'
+          );
+        }
+
+        setNotifications([]);
+        setShowDeleteModal(false);
+        setNotificationToDelete(null);
+        setDeleteAllMode(false);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || 'Unable to hide notifications.');
+      } finally {
+        setDeletingAll(false);
+      }
+
       return;
     }
 
-    const confirmed = window.confirm(
-      'Hide this notification from your account?\n\nThis will not affect other users.'
-    );
+    const id = getId(notificationToDelete?._id);
 
-    if (!confirmed) {
-      return;
-    }
+    if (!id) return;
 
     try {
-      setDeletingId(String(notificationId));
-      setError('');
+      setDeletingId(id);
 
       const response = await fetch(
-        `${API_URL}/api/notifications/${encodeURIComponent(notificationId)}/hide`,
+        `${API_URL}/api/notifications/${encodeURIComponent(id)}/hide`,
         {
           method: 'PATCH',
           headers: getHeaders(),
@@ -295,152 +346,130 @@ function Notifications() {
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-            `Failed to hide notification (${response.status}).`
+          data.message || 'Failed to hide notification.'
         );
       }
 
       setNotifications((previous) =>
-        previous.filter(
-          (item) => String(item._id) !== String(notificationId)
-        )
+        previous.filter((item) => getId(item._id) !== id)
       );
+
+      setShowDeleteModal(false);
+      setNotificationToDelete(null);
+      setDeleteAllMode(false);
     } catch (err) {
-      console.error('Error hiding notification:', err);
-      setError(
-        err.message || 'Failed to hide notification.'
-      );
+      console.error(err);
+      setError(err.message || 'Unable to hide notification.');
     } finally {
       setDeletingId('');
     }
   };
 
-  // HIDE ALL NOTIFICATIONS FOR ME
-  const handleDeleteAll = async () => {
-    if (!userId || !token) {
-      setError('Please log in again.');
-      return;
-    }
 
-    if (deletingAll || deletingId) {
-      return;
-    }
+  // Accept or decline requests
 
-    if (notifications.length === 0) {
-      return;
-    }
 
-    const confirmed = window.confirm(
-      'Hide all your notifications?\n\nThey will disappear from your account, but other users will not be affected.'
-    );
+const handleAction = async (notification, actionStatus) => {
+  const notificationId = getId(notification?._id);
 
-    if (!confirmed) {
-      return;
-    }
+  if (!notificationId || processingIds.includes(notificationId)) return;
 
-    try {
-      setDeletingAll(true);
-      setError('');
+  if (normalizeStatus(notification.status) !== 'pending') {
+    setError('This request has already been processed.');
+    return;
+  }
 
-      const response = await fetch(
-        `${API_URL}/api/notifications/hide-all`,
+  setProcessingIds((previous) => [...previous, notificationId]);
+  setError('');
+
+  try {
+    let response;
+
+    if (notification.type === 'Project') {
+      const projectId = getId(notification.projectId);
+      const requestId = getId(notification.requestId);
+
+      if (!projectId || !requestId) {
+        throw new Error('Missing project ID or join request ID.');
+      }
+
+      response = await fetch(
+        `${API_URL}/api/projects/${encodeURIComponent(projectId)}/requests/${encodeURIComponent(requestId)}`,
         {
           method: 'PATCH',
-          headers: getHeaders(),
+          headers: getHeaders(true),
+          body: JSON.stringify({
+            decision: actionStatus === 'accepted' ? 'Accept' : 'Reject',
+          }),
         }
       );
+    } else if (notification.type === 'Request') {
+      const connectionId = getId(notification.requestId);
 
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
+      if (!connectionId) {
         throw new Error(
-          data.message ||
-            `Failed to hide notifications (${response.status}).`
+          'Connection request ID is missing. Please refresh your notifications.'
         );
       }
 
-      setNotifications([]);
-    } catch (err) {
-      console.error('Error hiding notifications:', err);
-      setError(
-        err.message || 'Failed to hide all notifications.'
-      );
-    } finally {
-      setDeletingAll(false);
-    }
-  };
-
-  // ACCEPT / DECLINE ACTIONS
-  const handleAction = async (id, actionStatus) => {
-    if (!id || !userId || !token) {
-      setError('Please log in again.');
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${API_URL}/api/notifications/action/${encodeURIComponent(id)}`,
+      response = await fetch(
+        `${API_URL}/api/connections/${encodeURIComponent(connectionId)}/respond`,
         {
-          method: 'PUT',
+          method: 'PATCH',
           headers: getHeaders(true),
           body: JSON.stringify({
             status: actionStatus,
           }),
         }
       );
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(
-          data.message ||
-            `Failed to update notification (${response.status}).`
-        );
-      }
-
-      setNotifications((previous) =>
-        previous.map((notification) =>
-          String(notification._id) === String(id)
-            ? {
-                ...notification,
-                status: actionStatus,
-                isRead: true,
-              }
-            : notification
-        )
-      );
-
-      setError('');
-    } catch (err) {
-      console.error('Error updating notification:', err);
-      setError(
-        err.message || 'Failed to update notification.'
-      );
-    }
-  };
-
-  // FILTERING
-  const filteredNotifications = notifications.filter((item) => {
-    if (activeTab === 'All') {
-      return true;
+    } else {
+      throw new Error('This notification does not support this action.');
     }
 
-    return (
-      item.type &&
-      item.type.toLowerCase() === activeTab.toLowerCase()
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to process request.');
+    }
+
+    setNotifications((previous) =>
+      previous.map((item) =>
+        getId(item._id) === notificationId
+          ? {
+              ...item,
+              status: actionStatus,
+              isRead: true,
+            }
+          : item
+      )
     );
+
+    await fetchNotifications(false);
+  } catch (err) {
+    console.error('Action error:', err);
+    setError(err.message || 'Failed to process request.');
+  } finally {
+    setProcessingIds((previous) =>
+      previous.filter((id) => id !== notificationId)
+    );
+  }
+};
+
+
+
+  const filteredNotifications = notifications.filter((item) => {
+    if (activeTab === 'All') return true;
+    return String(item.type || '').toLowerCase() === activeTab.toLowerCase();
   });
 
-  const unreadCount = notifications.filter(
-    (notification) => !notification.isRead
-  ).length;
+  const unreadCount = notifications.filter((item) => !item.isRead).length;
 
   const getIconForType = (type) => {
     switch (type) {
       case 'Request':
         return '👤';
       case 'Project':
-        return '🎵';
+        return '📁';
       case 'Message':
         return '💬';
       default:
@@ -448,27 +477,45 @@ function Notifications() {
     }
   };
 
-  // RENDER UI
+  const renderStatus = (status) => {
+    const normalized = normalizeStatus(status);
+
+    if (normalized === 'accepted') {
+      return (
+        <span className="status-badge accepted">
+          ✓ Accepted
+        </span>
+      );
+    }
+
+    if (normalized === 'declined') {
+      return (
+        <span className="status-badge declined">
+          ✕ Declined
+        </span>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="notifications-page-container">
       <div className="notifications-header-row">
         <div>
           <span className="sub-title">STAY UPDATED</span>
-
           <h1>Notifications</h1>
-
           <p className="subtitle-desc">
-            Keep track of your connections, projects, messages,
-            and collaborations.
+            Keep track of your connections, projects, messages, and collaborations.
           </p>
         </div>
 
         <div className="notification-header-actions">
           {unreadCount > 0 && (
             <button
+              type="button"
               className="mark-all-read-btn"
               onClick={handleMarkAllRead}
-              type="button"
             >
               ✓ Mark all as read
             </button>
@@ -476,9 +523,9 @@ function Notifications() {
 
           {notifications.length > 0 && (
             <button
+              type="button"
               className="delete-all-notifications-btn"
               onClick={handleDeleteAll}
-              type="button"
               disabled={deletingAll || Boolean(deletingId)}
             >
               {deletingAll ? 'Deleting...' : '🗑 Delete all'}
@@ -494,22 +541,21 @@ function Notifications() {
             color: '#f87171',
             padding: '10px 0',
             display: 'flex',
-            alignItems: 'center',
             justifyContent: 'space-between',
+            gap: '12px',
           }}
         >
           <span>{error}</span>
-
           <button
             type="button"
             onClick={() => setError('')}
             aria-label="Dismiss error"
             style={{
               background: 'transparent',
-              border: 'none',
+              border: 0,
               color: '#f87171',
-              fontSize: '18px',
               cursor: 'pointer',
+              fontSize: '18px',
             }}
           >
             ×
@@ -522,9 +568,7 @@ function Notifications() {
           <button
             key={tab}
             type="button"
-            className={`filter-tab-btn ${
-              activeTab === tab ? 'active' : ''
-            }`}
+            className={`filter-tab-btn ${activeTab === tab ? 'active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
             {tab}
@@ -539,154 +583,250 @@ function Notifications() {
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="empty-notifications">
-            <div
-              style={{
-                fontSize: '40px',
-                marginBottom: '12px',
-              }}
-            >
-              🔔
-            </div>
-
+            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔔</div>
             <h3>No notifications yet</h3>
-
             <p>
               {activeTab === 'All'
-                ? "You're all caught up! When you receive requests, messages, or project invites, they will appear here."
+                ? "You're all caught up! New requests, messages, and project updates will appear here."
                 : `No ${activeTab.toLowerCase()} notifications found.`}
             </p>
           </div>
         ) : (
           filteredNotifications.map((notif) => {
-            const isMessage = notif.type === 'Message';
+            const id = getId(notif._id);
+            const status = normalizeStatus(notif.status);
+            const isProcessing = processingIds.includes(id);
+            const canRespond =
+              status === 'pending' &&
+              ['Request', 'Project'].includes(notif.type);
 
             return (
               <div
-                key={notif._id}
-                className={`notification-card ${
-                  !notif.isRead ? 'unread' : ''
-                }`}
-                onClick={() => handleNotificationClick(notif)}
+                key={id}
+                className={`notification-card ${!notif.isRead ? 'unread' : ''}`}
+                onClick={() => {
+                  if (!notif.isRead) handleMarkAsRead(notif);
+                  handleNotificationClick(notif);
+                }}
                 onKeyDown={(event) => {
                   if (
-                    isMessage &&
+                    notif.type === 'Message' &&
                     (event.key === 'Enter' || event.key === ' ')
                   ) {
                     event.preventDefault();
+                    if (!notif.isRead) handleMarkAsRead(notif);
                     handleNotificationClick(notif);
                   }
                 }}
-                role={isMessage ? 'button' : undefined}
-                tabIndex={isMessage ? 0 : undefined}
+                role={notif.type === 'Message' ? 'button' : undefined}
+                tabIndex={notif.type === 'Message' ? 0 : undefined}
                 style={{
-                  cursor: isMessage ? 'pointer' : 'default',
+                  cursor: notif.type === 'Message' ? 'pointer' : 'default',
                 }}
-                title={
-                  isMessage
-                    ? 'Click to open conversation'
-                    : undefined
-                }
               >
                 <div className="notif-icon-box">
-                  {getIconForType(notif.type)}
+              {notif.senderId &&
+              typeof notif.senderId === 'object' &&
+              ['Request', 'Project', 'Message'].includes(notif.type) ? (
+                <img
+                  src={
+                    notif.senderId.profileImage ||
+                    `https://api.dicebear.com/9.x/${encodeURIComponent(
+                      notif.senderId.avatarStyle || 'avataaars'
+                    )}/svg?seed=${encodeURIComponent(
+                      notif.senderId.username || getId(notif.senderId)
+                    )}`
+                  }
+                  alt="Sender profile"
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                  }}
+                />
+              ) : (
+                getIconForType(notif.type)
+              )}
                 </div>
 
                 <div className="notif-content-box">
                   <div className="notif-top-row">
-                    <h3>{notif.title}</h3>
+                    <div>
+                  {notif.senderId &&
+                    typeof notif.senderId === 'object' &&
+                    ['Request', 'Project', 'Message'].includes(notif.type) && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontWeight: 700,
+                          fontSize: '15px',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        @{notif.senderId.username || 'Unknown User'}
+                      </span>
+                    )}
+
+                  <h3>
+  {notif.senderId?.username && notif.type === 'Request'
+    ? normalizeStatus(notif.status) === 'accepted'
+      ? `@${notif.senderId.username} accepted your connection request`
+      : normalizeStatus(notif.status) === 'declined'
+      ? `@${notif.senderId.username} declined your connection request`
+      : `@${notif.senderId.username} sent you a connection request`
+    : notif.title}
+</h3>
+                </div>
 
                     <div className="notif-meta">
                       <span className="time-text">
-                        {notif.timeAgo || 'Just now'}
+                        {notif.timeAgo ||
+                          (notif.createdAt
+                            ? new Date(notif.createdAt).toLocaleString()
+                            : 'Just now')}
                       </span>
 
-                      {!notif.isRead && (
-                        <span className="unread-dot"></span>
-                      )}
+                      {!notif.isRead && <span className="unread-dot" />}
                     </div>
                   </div>
 
                   <p className="notif-description">
-                    {notif.description}
+                    {notif.senderId &&
+                    typeof notif.senderId === 'object' &&
+                    notif.senderId.username
+                      ? notif.type === 'Request'
+                        ? `@${notif.senderId.username} sent you a connection request.`
+                        : notif.type === 'Project' &&
+                          normalizeStatus(notif.status) === 'pending'
+                        ? `@${notif.senderId.username} requested to join your project.`
+                        : notif.description
+                      : notif.description}
                   </p>
 
-                  {isMessage && (
+                  {/* Accepted / Declined status */}
+                  {renderStatus(status)}
+
+                  {notif.type === 'Message' && (
                     <span
                       style={{
                         display: 'inline-block',
                         marginTop: '8px',
                         fontSize: '12px',
                         color: '#a855f7',
-                        fontWeight: '600',
+                        fontWeight: 600,
                       }}
                     >
                       Open conversation →
                     </span>
                   )}
 
-                  {notif.status === 'pending' &&
-                    (notif.type === 'Request' ||
-                      notif.type === 'Project') && (
-                      <div className="notif-action-buttons">
-                        <button
-                          className="action-btn accept-btn"
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleAction(notif._id, 'accepted');
-                          }}
-                        >
-                          ✓ Accept
-                        </button>
-
-                        <button
-                          className="action-btn decline-btn"
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleAction(notif._id, 'declined');
-                          }}
-                        >
-                          ✕ Decline
-                        </button>
-                      </div>
-                    )}
-
-                  {notif.status === 'accepted' && (
-                    <span className="status-badge accepted">
-                      ✓ Accepted
-                    </span>
-                  )}
-
-                  {notif.status === 'declined' && (
-                    <span className="status-badge declined">
-                      ✕ Declined
-                    </span>
-                  )}
-
-                  <div className="notif-delete-row">
-                    <button
-                      className="delete-notification-btn"
-                      type="button"
-                      disabled={
-                        deletingAll ||
-                        deletingId === String(notif._id)
-                      }
-                      onClick={(event) =>
-                        handleDeleteNotification(notif, event)
-                      }
+                  {/* Buttons only show while request is pending */}
+                  {canRespond && (
+                    <div
+                      className="notif-action-buttons"
+                      onClick={(event) => event.stopPropagation()}
                     >
-                      {deletingId === String(notif._id)
-                        ? 'Deleting...'
-                        : '🗑 Delete'}
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        className="action-btn accept-btn"
+                        disabled={isProcessing}
+                        onClick={() => handleAction(notif, 'accepted')}
+                      >
+                        {isProcessing ? 'Processing...' : '✓ Accept'}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="action-btn decline-btn"
+                        disabled={isProcessing}
+                        onClick={() => handleAction(notif, 'declined')}
+                      >
+                        {isProcessing ? 'Processing...' : '✕ Decline'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className="notif-delete-row"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className="delete-notification-btn"
+                    title="Hide notification"
+                    aria-label="Hide notification"
+                    disabled={deletingId === id || deletingAll}
+                    onClick={(event) =>
+                      handleDeleteNotification(notif, event)
+                    }
+                  >
+                    {deletingId === id ? '...' : '×'}
+                  </button>
                 </div>
               </div>
             );
           })
         )}
-      </div>
+            </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          className="delete-modal-overlay"
+          onClick={cancelDeleteNotification}
+        >
+          <div
+            className="delete-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="delete-modal-icon">🗑️</div>
+
+            <h2>
+              {deleteAllMode
+                ? 'Delete All Notifications?'
+                : 'Delete Notification?'}
+            </h2>
+
+            <p>
+              {deleteAllMode
+                ? 'Are you sure you want to delete all your notifications?'
+                : 'Are you sure you want to delete this notification? '}
+            </p>
+
+            {error && (
+              <p className="delete-modal-error" role="alert">
+                {error}
+              </p>
+            )}
+
+            <div className="delete-modal-actions">
+              <button
+                type="button"
+                className="delete-modal-cancel"
+                onClick={cancelDeleteNotification}
+                disabled={deletingAll || Boolean(deletingId)}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="delete-modal-confirm"
+                onClick={confirmDeleteNotification}
+                disabled={deletingAll || Boolean(deletingId)}
+              >
+                {deletingAll || deletingId
+                  ? 'Deleting...'
+                  : deleteAllMode
+                  ? 'Delete All'
+                  : 'Delete Notification'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

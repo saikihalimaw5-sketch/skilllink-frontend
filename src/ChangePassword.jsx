@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './ChangePassword.css';
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
 
 function ChangePassword() {
   const navigate = useNavigate();
@@ -93,7 +97,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/forgot-password',
+        `${API_URL}/api/auth/forgot-password`,
         {
           email: cleanEmail
         }
@@ -129,7 +133,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/forgot-password',
+        `${API_URL}/api/auth/forgot-password`,
         {
           email: email.trim().toLowerCase()
         }
@@ -180,7 +184,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/reset-password',
+        `${API_URL}/api/auth/reset-password`,
         {
           email: email.trim().toLowerCase(),
           otp: otp.trim(),
@@ -575,7 +579,18 @@ function ChangePassword() {
           <button
             type="button"
             className="link-switch"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+  if (location.state?.settingsTab === 'privacy') {
+    navigate('/dashboard', {
+      state: {
+        activeTab: 'Settings',
+        settingsTab: 'privacy'
+      }
+    });
+  } else {
+    navigate(-1);
+  }
+}}
           >
             ← Back
           </button>

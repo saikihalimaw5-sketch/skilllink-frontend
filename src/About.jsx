@@ -7,24 +7,47 @@ function About({ onGoHome }) {
       {/* Navigation bar */}
       <nav className="navbar">
         <div className="navbar-inner">
-          <div className="navbar-logo" onClick={onGoHome} style={{ cursor: 'pointer' }}>
+          <div
+            className="navbar-logo"
+            onClick={onGoHome}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="brand-logo">
               <span className="brand-main-text">SkillLink</span>
             </div>
           </div>
 
           <ul className="navbar-links">
-            <li><a href="#" onClick={(e) => { e.preventDefault(); onGoHome(); }}>Home</a></li>
-            <li><a href="#explore">Explore</a></li>
-            <li><a href="#" className="active">About</a></li>
+            <li>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onGoHome();
+                }}
+              >
+                Home
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#"
+                className="active"
+                onClick={(e) => e.preventDefault()}
+              >
+                About
+              </a>
+            </li>
           </ul>
         </div>
       </nav>
 
-      {/* Main Content - No Scroll Viewport */}
+      {/* Main Content */}
       <main className="about-content-container">
         <div className="about-inner">
           <h1 className="section-title">How SkillLink Works</h1>
+
           <p className="section-subtitle">
             3 simple steps to find collaborators and launch your next project
           </p>

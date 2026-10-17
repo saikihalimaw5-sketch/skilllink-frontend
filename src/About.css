@@ -7,7 +7,7 @@
   overflow: hidden;
   position: relative;
   background-color: #06060c;
-  background-image: 
+  background-image:
     radial-gradient(ellipse at 88% 20%, rgba(212, 140, 50, 0.28) 0%, rgba(120, 60, 180, 0.18) 35%, transparent 70%),
     radial-gradient(circle at 15% 85%, rgba(90, 40, 160, 0.15) 0%, transparent 55%),
     radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
@@ -45,7 +45,7 @@
 .about-page-container .navbar-links {
   display: flex;
   list-style: none;
-  gap: 4.5rem;
+  gap: 2.7rem;
   margin: 0;
   padding: 0;
 }

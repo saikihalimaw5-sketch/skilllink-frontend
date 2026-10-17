@@ -6,15 +6,24 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import './Messages.css';
 
-const API_URL = 'http://localhost:5000/api';
-const SOCKET_URL = 'http://localhost:5000';
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
 
-function Messages() {
+const API_URL = `${BASE_URL}/api`;
+const SOCKET_URL = BASE_URL;
+
+function Messages({ selectedUser }) {
   const location = useLocation();
 
-  const openChatUserId = String(
-    location.state?.openChatUserId || ''
-  );
+ const openChatUserId = String(
+  selectedUser?._id ||
+    selectedUser?.id ||
+    selectedUser?.userId ||
+    location.state?.openChatUserId ||
+    ''
+);
 
   const [users, setUsers] = useState([]);
   const [chats, setChats] = useState([]);
@@ -28,10 +37,16 @@ function Messages() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [deletingChatId, setDeletingChatId] = useState('');
+  const [chatToDelete, setChatToDelete] = useState(null);
   const [openMenuChatId, setOpenMenuChatId] = useState('');
+
+  const [openMessageMenuId, setOpenMessageMenuId] = useState('');
   const [error, setError] = useState('');
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showDeleteMessageNotice, setShowDeleteMessageNotice] =
+  useState(false);
+  const [messageToDelete, setMessageToDelete] = useState(null);
   const [emojiPosition, setEmojiPosition] = useState({
     top: 0,
     left: 0,
@@ -182,18 +197,17 @@ function Messages() {
     );
   };
 
-  const getUserName = (user) => {
-    if (!user) return 'Unknown User';
-    if (typeof user === 'string') return 'User';
+ const getUserName = (user) => {
+  if (!user) return 'Unknown User';
+  if (typeof user === 'string') return 'User';
 
-    return (
-      user.fullName ||
-      user.name ||
-      user.username ||
-      user.email ||
-      'Unknown User'
-    );
-  };
+  return (
+    user.username ||
+    user.name ||
+    user.email ||
+    'Unknown User'
+  );
+};
 
   const getUserRole = (user) => {
     if (!user || typeof user === 'string') {
@@ -208,10 +222,23 @@ function Messages() {
     );
   };
 
-  const getAvatar = (name) => {
-    return name ? name.charAt(0).toUpperCase() : '?';
-  };
+ // Same avatar logic as MyProjects.jsx
+const getAvatar = (user) => {
+  if (user?.profileImage) {
+    return user.profileImage;
+  }
 
+  const seed =
+    user?.username ||
+    user?.email ||
+    user?._id ||
+    user?.id ||
+    'SkillLink User';
+
+  const style = user?.avatarStyle || 'avataaars';
+
+  return `https://api.dicebear.com/9.x/${encodeURIComponent(style)}/svg?seed=${encodeURIComponent(seed)}`;
+};
   const getMessageTime = (date) => {
     if (!date) return '';
 
@@ -275,7 +302,7 @@ function Messages() {
       lastMsg: '',
       time: '',
       unread: 0,
-      avatar: getAvatar(name),
+      avatar: getAvatar(user),
       online: false,
       user,
     };
@@ -356,8 +383,19 @@ function Messages() {
         setLoadingChats(true);
         setError('');
 
-        const normalizedUsers = await fetchUsers();
+          const fetchedUsers = await fetchUsers();
 
+            const normalizedUsers = [...fetchedUsers];
+
+            if (
+                selectedUser &&
+                openChatUserId &&
+                String(selectedUser._id || selectedUser.id || selectedUser.userId || '') === openChatUserId &&
+                !normalizedUsers.some((chat) => chat.id === openChatUserId) &&
+                openChatUserId !== currentUserId
+              ) {
+                normalizedUsers.unshift(normalizeChat(selectedUser));
+              }
         if (cancelled) return;
 
         const deletedIds = getDeletedConversationIds();
@@ -380,9 +418,9 @@ function Messages() {
               const saved = savedOrder[chat.id];
 
               return {
-                ...chat,
-                ...(previous || {}),
-                ...(saved
+            ...(previous || {}),
+            ...chat,
+            ...(saved
                   ? {
                       lastMsg:
                         saved.lastMsg ||
@@ -400,13 +438,18 @@ function Messages() {
           )
         );
 
-        setActiveChat((current) => {
+       setActiveChat((current) => {
           if (openChatUserId) {
             const targetChat = normalizedUsers.find(
               (chat) => chat.id === openChatUserId
             );
 
-            if (targetChat) return targetChat;
+            if (targetChat) {
+              return {
+                ...(current || {}),
+                ...targetChat,
+              };
+            }
           }
 
           if (current) {
@@ -414,12 +457,15 @@ function Messages() {
               (chat) => chat.id === current.id
             );
 
-            if (matchingChat) return matchingChat;
+            if (matchingChat) {
+              return {
+                ...current,
+                ...matchingChat,
+              };
+            }
           }
 
-          const sortedVisibleChats = sortChatsByLatest(
-            visibleChats
-          );
+          const sortedVisibleChats = sortChatsByLatest(visibleChats);
 
           return sortedVisibleChats[0] || null;
         });
@@ -448,13 +494,61 @@ function Messages() {
       }
     };
 
-    loadChats();
+            loadChats();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [token, currentUserId, openChatUserId]);
+            const intervalId = setInterval(async () => {
+              try {
+                const updatedUsers = await fetchUsers();
 
+                if (cancelled) return;
+
+                setUsers(updatedUsers);
+
+                setChats((previousChats) =>
+                  previousChats.map((chat) => {
+                    const updated = updatedUsers.find(
+                      (user) => user.id === chat.id
+                    );
+
+                    return updated
+                      ? {
+                          ...chat,
+                          name: updated.name,
+                          avatar: updated.avatar,
+                          role: updated.role,
+                          user: updated.user,
+                        }
+                      : chat;
+                  })
+                );
+
+            setActiveChat((current) => {
+              if (!current) return current;
+
+              const updated = updatedUsers.find(
+                (user) => user.id === current.id
+              );
+
+              return updated
+                ? {
+                    ...current,
+                    name: updated.name,
+                    avatar: updated.avatar,
+                    role: updated.role,
+                    user: updated.user,
+                  }
+                : current;
+            });
+          } catch (err) {
+            console.error('Failed to refresh user profiles:', err);
+          }
+        }, 4000);
+
+       return () => {
+  cancelled = true;
+  clearInterval(intervalId);
+};
+}, [token, currentUserId, openChatUserId, selectedUser]);
   // ==========================================
   // SEARCH USERS FROM BACKEND
   // ==========================================
@@ -526,6 +620,35 @@ function Messages() {
         Array.isArray(userIds) ? userIds.map(String) : []
       );
     });
+    // REAL-TIME PROFILE UPDATES
+socket.on('profile_updated', (updatedProfile) => {
+  const updatedId = String(updatedProfile.userId);
+
+  const updateUser = (chat) => {
+    if (String(chat.id) !== updatedId) return chat;
+
+    const updatedUser = {
+      ...chat.user,
+      username: updatedProfile.username,
+      profileImage: updatedProfile.profileImage,
+      avatarStyle: updatedProfile.avatarStyle,
+    };
+
+    return {
+      ...chat,
+      name: getUserName(updatedUser),
+      avatar: getAvatar(updatedUser),
+      user: updatedUser,
+    };
+  };
+
+  setUsers((previous) => previous.map(updateUser));
+  setChats((previous) => previous.map(updateUser));
+  setSearchResults((previous) => previous.map(updateUser));
+  setActiveChat((previous) =>
+    previous ? updateUser(previous) : previous
+  );
+});
 
     socket.on(
       'conversation_restored',
@@ -578,6 +701,17 @@ function Messages() {
         }
       }
     );
+// ==========================================
+// REAL-TIME DELETE FOR EVERYONE
+// ==========================================
+
+socket.on('message_deleted_for_everyone', ({ messageId }) => {
+  setMessages((previousMessages) =>
+    previousMessages.filter(
+      (message) => message.id !== String(messageId)
+    )
+  );
+});
 
     socket.on('receive_message', (incomingMessage) => {
       const normalizedMessage =
@@ -1048,13 +1182,12 @@ function Messages() {
 
     setOpenMenuChatId('');
 
-    const confirmed = window.confirm(
-      `Delete your conversation with ${chat.name}?\n\n` +
-        'This hides the conversation from your Chats list. The account will remain searchable.'
-    );
+    if (chatToDelete?.id !== chat.id) {
+  setChatToDelete(chat);
+  return;
+}
 
-    if (!confirmed) return;
-
+setChatToDelete(null);
     try {
       setDeletingChatId(chat.id);
       setError('');
@@ -1094,7 +1227,46 @@ function Messages() {
       setDeletingChatId('');
     }
   };
+  // ==========================================
+  // DELETE SINGLE MESSAGE FOR ME
+  // ==========================================
 
+  const handleDeleteMessage = async () => {
+    if (!messageToDelete?.id || !token) return;
+
+    try {
+      setError('');
+
+      const deleteType = messageToDelete.deleteType;
+
+const endpoint =
+  deleteType === 'everyone'
+    ? `${API_URL}/messages/everyone/${messageToDelete.id}`
+    : `${API_URL}/messages/single/${messageToDelete.id}`;
+
+await axios.delete(endpoint, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
+      setMessages((previousMessages) =>
+        previousMessages.filter(
+          (message) => message.id !== messageToDelete.id
+        )
+      );
+
+      setShowDeleteMessageNotice(false);
+      setMessageToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete message:', err);
+
+      setError(
+        err.response?.data?.message ||
+          'Failed to delete message. Please try again.'
+      );
+    }
+  };
   // ==========================================
   // FILTER CHATS AND SEARCH RESULTS
   // ==========================================
@@ -1193,15 +1365,19 @@ function Messages() {
                     }
                   }}
                 >
-                  <div className="avatar-wrapper">
-                    <div className="avatar">
-                      {chat.avatar}
-                    </div>
-
-                    {chat.online && (
-                      <span className="online-dot"></span>
-                    )}
+                 <div className="avatar-wrapper">
+                  <div className="avatar">
+                    <img
+                      src={chat.avatar}
+                      alt={`${chat.name}'s avatar`}
+                      className="dicebear-avatar-img"
+                    />
                   </div>
+
+                  {chat.online && (
+                    <span className="online-dot"></span>
+                  )}
+                </div>
 
                   <div className="chat-info">
                     <div className="chat-info-top">
@@ -1243,14 +1419,18 @@ function Messages() {
               <div className="active-chat-header">
                 <div className="active-user-details">
                   <div className="avatar-wrapper">
-                    <div className="avatar">
-                      {activeChat.avatar}
-                    </div>
-
-                    {activeChat.online && (
-                      <span className="online-dot"></span>
-                    )}
+                  <div className="avatar">
+                    <img
+                      src={activeChat.avatar}
+                      alt={`${activeChat.name}'s avatar`}
+                      className="dicebear-avatar-img"
+                    />
                   </div>
+
+                  {activeChat.online && (
+                    <span className="online-dot"></span>
+                  )}
+                </div>
 
                   <div className="active-user-text">
                     <h3>{activeChat.name}</h3>
@@ -1264,60 +1444,6 @@ function Messages() {
                 </div>
 
                 <div className="chat-header-actions">
-                  <button
-                    className="icon-action-btn"
-                    title="Call"
-                    type="button"
-                    aria-label="Call"
-                    onClick={() =>
-                      setError('Voice calls are not available yet.')
-                    }
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 11.19 18a19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.09 3.18 2 2 0 0 1 4.08 1h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.11L8.06 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.84.58 2.8.7A2 2 0 0 1 22 16.92Z" />
-                    </svg>
-                  </button>
-
-                  <button
-                    className="icon-action-btn"
-                    title="Video Call"
-                    type="button"
-                    aria-label="Video call"
-                    onClick={() =>
-                      setError('Video calls are not available yet.')
-                    }
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect
-                        x="3"
-                        y="6"
-                        width="13"
-                        height="12"
-                        rx="2"
-                      />
-                      <path d="m16 10 5-3v10l-5-3" />
-                    </svg>
-                  </button>
 
                   {/* HEADER MENU */}
                   <div
@@ -1435,19 +1561,72 @@ function Messages() {
                       }`}
                     >
                       {msg.sender !== 'me' && (
-                        <div className="msg-avatar">
-                          {activeChat.avatar}
-                        </div>
-                      )}
-
-                      <div className="message-content">
-                        <p>{msg.text}</p>
-
-                        <span className="msg-timestamp">
-                          {msg.time}
-                        </span>
+                      <div className="msg-avatar">
+                        <img
+                          src={activeChat.avatar}
+                          alt={`${activeChat.name}'s avatar`}
+                          className="dicebear-avatar-img"
+                        />
                       </div>
+                    )}
+
+                     <div className="message-with-options">
+                    <div className="message-content">
+                      <p>{msg.text}</p>
+
+                      <span className="msg-timestamp">
+                        {msg.time}
+                      </span>
                     </div>
+
+                    {msg.sender === 'me' && (
+                      <div className="message-options-wrapper">
+                        <button
+                          type="button"
+                          className="message-options-btn"
+                          title="Message options"
+                          aria-label="Message options"
+                          aria-expanded={openMessageMenuId === msg.id}
+                          onClick={() =>
+                            setOpenMessageMenuId((current) =>
+                              current === msg.id ? '' : msg.id
+                            )
+                          }
+                        >
+                          ⋯
+                        </button>
+
+                        {openMessageMenuId === msg.id && (
+  <div className="message-options-dropdown">
+    <button
+      type="button"
+      className="message-delete-option"
+      onClick={() => {
+        setOpenMessageMenuId('');
+        setMessageToDelete({ ...msg, deleteType: 'me' });
+        setShowDeleteMessageNotice(true);
+      }}
+    >
+      Delete for Me
+    </button>
+
+    <button
+      type="button"
+      className="message-delete-option"
+      onClick={() => {
+        setOpenMessageMenuId('');
+        setMessageToDelete({ ...msg, deleteType: 'everyone' });
+        setShowDeleteMessageNotice(true);
+      }}
+    >
+      Delete for Everyone
+    </button>
+  </div>
+)}
+                      </div>
+                    )}
+                  </div>
+                 </div>
                   ))
                 )}
               </div>
@@ -1581,7 +1760,103 @@ function Messages() {
             ×
           </button>
         </div>
-      )}
+                )}
+          {/* DELETE CONVERSATION CONFIRMATION POPUP */}
+          {chatToDelete &&
+            createPortal(
+              <div className="delete-conversation-overlay">
+                <div
+            className="delete-conversation-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-conversation-title"
+          >
+
+        <div className="delete-conversation-icon">
+            🗑️
+          </div>
+
+        <h2 id="delete-conversation-title">
+          Delete Conversation?
+        </h2>
+
+      <p>
+        Are you sure you want to delete your conversation with{' '}
+          <strong>{chatToDelete.name}</strong>?
+          <br />
+          This conversation will be removed from your Chats list.
+        </p>
+
+        <div className="delete-conversation-actions">
+          <button
+        type="button"
+        className="delete-conversation-cancel"
+        disabled={Boolean(deletingChatId)}
+        onClick={() => setChatToDelete(null)}
+      >
+            Cancel
+          </button>
+        <button
+          type="button"
+          className="delete-conversation-confirm"
+          disabled={Boolean(deletingChatId)}
+          onClick={() => handleDeleteConversation(chatToDelete)}
+        >
+          {deletingChatId ? 'Deleting...' : 'Yes, Delete'}
+        </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  )}
+
+{/* DELETE MESSAGE NOTICE POPUP */}
+{showDeleteMessageNotice &&
+  createPortal(
+    <div className="delete-message-notice-overlay">
+      <div
+        className="delete-message-notice-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-message-notice-title"
+      >
+        <div className="delete-message-notice-icon">
+          🗑️
+        </div>
+
+        <h2 id="delete-message-notice-title">
+          Delete Message?
+        </h2>
+
+        <p>
+  {messageToDelete?.deleteType === 'everyone'
+    ? 'Are you sure you want to delete this message for everyone? This action cannot be undone.'
+    : 'Are you sure you want to delete this message for yourself? The other person can still see it.'}
+</p>
+
+
+        <div className="delete-message-notice-actions">
+          <button
+            type="button"
+            className="delete-message-notice-cancel"
+            onClick={() => setShowDeleteMessageNotice(false)}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            className="delete-message-notice-confirm"
+              onClick={handleDeleteMessage}
+              >
+            Delete Message
+          </button>
+        </div>
+
+      </div>
+    </div>,
+    document.body
+  )}
 
       {/* EMOJI PICKER PORTAL */}
       {showEmojiPicker &&

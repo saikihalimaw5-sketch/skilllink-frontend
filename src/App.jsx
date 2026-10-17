@@ -8,7 +8,8 @@ import About from './About';
 import Settings from './Settings';
 import ChangePassword from './ChangePassword';
 import Messages from './Messages';
-import Notifications from './Notifications'; // Import Notifications
+import Notifications from './Notifications';
+import Explore from './Explore';
 import './App.css';
 
 // Landing page component
@@ -16,15 +17,14 @@ function LandingPage() {
   const navigate = useNavigate();
 
   const heroImg =
-    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop";
+    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop';
 
   return (
     <div className="landing-container">
       {/* Header navigation */}
       <nav className="navbar">
         <div className="navbar-inner">
-
-          {/* Main brand text logo */}
+          {/* SkillLink logo */}
           <div
             className="navbar-logo"
             onClick={() => navigate('/')}
@@ -35,7 +35,7 @@ function LandingPage() {
             </div>
           </div>
 
-          {/* Navigation links */}
+          {/* Navigation links on the upper-right */}
           <ul className="navbar-links">
             <li>
               <a
@@ -47,10 +47,6 @@ function LandingPage() {
               >
                 Home
               </a>
-            </li>
-
-            <li>
-              <a href="#explore">Explore</a>
             </li>
 
             <li>
@@ -68,7 +64,7 @@ function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero banner section */}
+      {/* Hero section */}
       <section className="hero">
         <div className="hero-inner">
           <div className="hero-content">
@@ -85,16 +81,27 @@ function LandingPage() {
               skills, and turn your hobbies into meaningful projects.
             </p>
 
+            {/* Get Start and Explore buttons */}
             <div className="hero-buttons">
               <button
+                type="button"
                 className="btn-primary"
                 onClick={() => navigate('/login')}
               >
                 Get Start
               </button>
+
+              <button
+                type="button"
+                className="btn-explore"
+                onClick={() => navigate('/explore')}
+              >
+                Explore
+              </button>
             </div>
           </div>
 
+          {/* Hero image */}
           <div className="hero-image-container">
             <img
               src={heroImg}
@@ -114,8 +121,13 @@ function App() {
 
   return (
     <Routes>
+      {/* Landing page */}
       <Route path="/" element={<LandingPage />} />
 
+      {/* Explore page */}
+      <Route path="/explore" element={<Explore />} />
+
+      {/* About page */}
       <Route
         path="/about"
         element={
@@ -127,6 +139,7 @@ function App() {
         }
       />
 
+      {/* Login page */}
       <Route
         path="/login"
         element={
@@ -138,6 +151,7 @@ function App() {
         }
       />
 
+      {/* Signup page */}
       <Route
         path="/signup"
         element={
@@ -149,6 +163,7 @@ function App() {
         }
       />
 
+      {/* Hobbies page */}
       <Route
         path="/hobbies"
         element={
@@ -175,6 +190,7 @@ function App() {
         }
       />
 
+      {/* Dashboard */}
       <Route
         path="/dashboard"
         element={
@@ -184,23 +200,25 @@ function App() {
         }
       />
 
+      {/* Settings */}
       <Route
         path="/settings"
         element={<Settings />}
       />
 
+      {/* Change Password */}
       <Route
         path="/change-password"
         element={<ChangePassword />}
       />
 
-      {/* Messages page */}
+      {/* Messages */}
       <Route
         path="/messages"
         element={<Messages />}
       />
 
-      {/* Notifications page */}
+      {/* Notifications */}
       <Route
         path="/notifications"
         element={<Notifications />}
