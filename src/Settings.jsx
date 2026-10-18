@@ -359,9 +359,9 @@ useEffect(() => {
 
   if (!username) {
     errors.username = 'Username is required.';
-  } else if (!/^[a-zA-Z0-9_]{3,8}$/.test(username)) {
+  } else if (!/^[a-zA-Z0-9_]{3,15}$/.test(username)) {
   errors.username =
-    'Username must be 3–8 characters using letters, numbers, or underscores.';
+   'Username must be 3–15 characters using letters, numbers, or underscores.';
 }
 
   if (!email) {
@@ -642,7 +642,7 @@ useEffect(() => {
                         handleProfileChange('username', e.target.value)
                       }
                       placeholder="Enter your username"
-                      maxLength={8}
+                      maxLength={15}
                       required
                     />
 
