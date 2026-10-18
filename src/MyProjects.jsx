@@ -200,10 +200,10 @@ const getUserAvatar = (user) => {
       : 'avataaars';
 
   const seed =
-    user?.username ||
-    user?.email ||
+    user?.id ||
     user?._id ||
-    'SkillLink User';
+    user?.username ||
+    'User';
 
   return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
 };
