@@ -170,10 +170,12 @@ function Signup({ onSwitchToLogin, onGoHome, onSignupSuccess }) {
     const { username, email, phoneNumber, password, confirmPassword } = formData;
 
     if (!username.trim()) {
-      nextErrors.username = 'Username is required.';
-    } else if (username.trim().length > 8) {
-      nextErrors.username = 'Username must not exceed 8 characters.';
-    }
+  nextErrors.username = 'Username is required.';
+} else if (username.trim().length < 3 || username.trim().length > 15) {
+  nextErrors.username = 'Username must be between 3 and 15 characters long.';
+} else if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
+  nextErrors.username = 'Only letters, numbers, and underscores are allowed.';
+}
 
     if (!email.trim()) {
       nextErrors.email = 'Email address is required.';
@@ -379,8 +381,9 @@ function Signup({ onSwitchToLogin, onGoHome, onSignupSuccess }) {
                   type="text"
                   name="username"
                   className={`form-input ${errors.username ? 'input-error' : ''}`}
-                  placeholder="Max 8 characters"
-                  maxLength={8}
+                  placeholder="Enter a username (3–15 characters)"
+                  minLength={3}
+                  maxLength={15}
                   value={formData.username}
                   onChange={handleChange}
                 />
