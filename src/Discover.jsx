@@ -130,6 +130,7 @@ const getTokenUserId = (token) => {
   }
 };
 
+
 const getPersonAvatar = (person) => {
   if (person?.profileImage) {
     return person.profileImage;
@@ -140,10 +141,13 @@ const getPersonAvatar = (person) => {
       ? person.avatarStyle
       : 'avataaars';
 
-  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(
-    person?.name || person?.username || 'SkillLink User'
+  const userId = getId(person);
+
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(
+    userId || person?.username || 'SkillLink User'
   )}`;
 };
+
 
 function Discover({ onOpenProjectChat, initialTab = 'Hobbies' }) {
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -800,17 +804,17 @@ const request = requests.find((item) => {
         )
       );
 
-      return {
-        ...person,
-        id: person._id,
-        name: person.username || 'SkillLink User',
-        username: person.username
-          ? `@${person.username.replace(/^@/, '')}`
-          : '@user',
-        hobbies: personHobbies,
-        sharedHobbyList: sharedHobbies,
-        sharedHobbies: sharedHobbies.length
-      };
+     return {
+  ...person,
+  id: person._id,
+  name: person.username || person.fullName || 'Unnamed User',
+  username: person.username
+    ? `@${person.username.replace(/^@/, '')}`
+    : 'No username set',
+  hobbies: personHobbies,
+  sharedHobbyList: sharedHobbies,
+  sharedHobbies: sharedHobbies.length
+};
     })
     .filter((person) => person.sharedHobbies > 0)
     .sort((a, b) => b.sharedHobbies - a.sharedHobbies);
@@ -838,9 +842,13 @@ const request = requests.find((item) => {
   // PROJECT HELPERS
   // ==========================================
 
-  const getProjectOwnerName = (project) => {
+ const getProjectOwnerName = (project) => {
   if (project.owner && typeof project.owner === 'object') {
-    return project.owner.username || 'Project Creator';
+    return (
+      project.owner.username ||
+      project.owner.fullName ||
+      'Unnamed User'
+    );
   }
 
   return 'Project Creator';
@@ -1101,15 +1109,13 @@ const hasPendingRequest = (project) => {
                           src={getPersonAvatar(person)}
                           alt={`${person.name || 'User'}'s avatar`}
                           className="discover-people-avatar-img"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src =
-                              `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-                                person.fullName ||
-                                  person.name ||
-                                  'SkillLink User'
-                              )}`;
-                          }}
+                          
+onError={(e) => {
+  e.currentTarget.onerror = null;
+  e.currentTarget.src =
+    'https://api.dicebear.com/9.x/avataaars/svg?seed=SkillLink';
+}}
+
                         />
                       </div>
 
@@ -1326,13 +1332,13 @@ const hasPendingRequest = (project) => {
                             src={getPersonAvatar(project.owner)}
                             alt={`${getProjectOwnerName(project)}'s avatar`}
                             className="discover-project-owner-avatar-img"
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src =
-                                `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-                                  getProjectOwnerName(project)
-                                )}`;
-                            }}
+                           
+onError={(e) => {
+  e.currentTarget.onerror = null;
+  e.currentTarget.src =
+    'https://api.dicebear.com/9.x/avataaars/svg?seed=SkillLink';
+}}
+
                           />
                         </div>
 
@@ -1494,13 +1500,13 @@ const hasPendingRequest = (project) => {
             <img
               src={getPersonAvatar(profilePerson)}
               alt={`${profilePerson.name || "User"}'s avatar`}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src =
-                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-                    profilePerson.name || "SkillLink User"
-                  )}`;
-              }}
+              
+onError={(e) => {
+  e.currentTarget.onerror = null;
+  e.currentTarget.src =
+    'https://api.dicebear.com/9.x/avataaars/svg?seed=SkillLink';
+}}
+
             />
           </div>
 
@@ -1640,13 +1646,13 @@ Connect
                       src={getPersonAvatar(selectedPerson)}
                       alt={`${selectedPerson.name}'s profile`}
                       className="discover-connect-avatar-img"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src =
-                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-                            selectedPerson.name || "SkillLink User"
-                          )}`;
-                      }}
+                      
+onError={(e) => {
+  e.currentTarget.onerror = null;
+  e.currentTarget.src =
+    'https://api.dicebear.com/9.x/avataaars/svg?seed=SkillLink';
+}}
+
                     />
                   </div>
 

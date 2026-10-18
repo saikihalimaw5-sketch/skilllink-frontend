@@ -675,6 +675,8 @@ const handleAction = async (notification, actionStatus) => {
       : normalizeStatus(notif.status) === 'declined'
       ? `@${notif.senderId.username} declined your connection request`
       : `@${notif.senderId.username} sent you a connection request`
+    : notif.senderId?.username && notif.type === 'Message'
+    ? `New message from @${notif.senderId.username}`
     : notif.title}
 </h3>
                 </div>

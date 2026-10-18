@@ -578,11 +578,14 @@ useEffect(() => {
                     <div className="avatar-circle">
                       <img
                         src={
-                          profileImage ||
-                          `https://api.dicebear.com/7.x/${avatarStyle}/svg?seed=${encodeURIComponent(
-                            profileData.username || profileData.email || 'User'
-                          )}`
-                        }
+  profileImage ||
+  `https://api.dicebear.com/9.x/${avatarStyle}/svg?seed=${encodeURIComponent(
+    getLoggedInUser()?.id ||
+    getLoggedInUser()?._id ||
+    profileData.username ||
+    'User'
+  )}`
+}
                         alt="Profile Avatar"
                         className="avatar-img"
                       />

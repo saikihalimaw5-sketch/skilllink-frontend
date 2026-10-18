@@ -185,12 +185,32 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
       }
 
       if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
+  const loggedInUser = response.data.user;
 
-      if (onLoginSuccess) {
-        onLoginSuccess(response.data);
-      }
+  const userId = loggedInUser.id || loggedInUser._id;
+
+  const profileImage =
+    loggedInUser.profileImage ||
+    `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(
+      String(userId || loggedInUser.username)
+    )}`;
+
+  localStorage.setItem(
+    'user',
+    JSON.stringify({
+      ...loggedInUser,
+      profileImage,
+      avatarStyle: loggedInUser.avatarStyle || 'avataaars'
+    })
+  );
+}
+
+     if (onLoginSuccess) {
+  onLoginSuccess({
+    ...response.data,
+    user: JSON.parse(localStorage.getItem('user'))
+  });
+}
 
       navigate('/hobbies');
     } catch (err) {

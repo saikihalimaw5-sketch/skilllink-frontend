@@ -357,9 +357,9 @@ const unreadData = unreadResponse.ok
             setUserId(String(savedUserId));
           }
 
-          if (currentUser.avatar) {
-            setUserAvatar(currentUser.avatar);
-          }
+          if (currentUser.profileImage || currentUser.avatar) {
+  setUserAvatar(currentUser.profileImage || currentUser.avatar);
+}
         }
       // Fetch current user's hobbies
       if (token) {
@@ -492,16 +492,23 @@ const unreadData = unreadResponse.ok
             setUserName(savedProfile.username);
           }
 
-        const avatarStyle = savedProfile?.avatarStyle || 'avataaars';
+        const avatarStyle =
+  savedProfile?.avatarStyle ||
+  user?.avatarStyle ||
+  'avataaars';
 
-        const defaultAvatar =
-          `https://api.dicebear.com/7.x/${avatarStyle}/svg?seed=${encodeURIComponent(username)}`;
+const defaultAvatar =
+  `https://api.dicebear.com/9.x/${avatarStyle}/svg?seed=${encodeURIComponent(
+    user?.id || user?._id || username
+  )}`;
 
-        const avatar = savedProfile
-          ? savedProfile.profileImage || defaultAvatar
-          : user?.avatar || defaultAvatar;
+const avatar =
+  savedProfile?.profileImage ||
+  user?.profileImage ||
+  user?.avatar ||
+  defaultAvatar;
 
-        setUserAvatar(avatar);
+setUserAvatar(avatar);
       } catch (error) {
         console.error('Failed to sync profile avatar:', error);
       }
@@ -696,8 +703,8 @@ useEffect(() => {
 
     setSelectedChatUser({
   _id: String(person._id),
-  fullName: person.username || 'SkillLink Member',
-  name: person.username || 'SkillLink Member',
+  fullName: person.username || person.fullName || 'SkillLink Member',
+  name: person.username || person.fullName || 'SkillLink Member',
   username: person.username || '',
   avatar: person.profileImage || person.avatar || '',
   email: person.email || '',
@@ -1037,9 +1044,9 @@ useEffect(() => {
                 <img
                   src={
                     userAvatar ||
-                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
-                      userName
-                    )}`
+                   `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(
+  userName
+)}`
                   }
                   alt="Profile Avatar"
                   className="header-avatar-img"
@@ -1318,21 +1325,30 @@ useEffect(() => {
                           >
                             <div className="person-card-header">
                               <img
-                            src={
-                              person.profileImage ||
-                              `https://api.dicebear.com/7.x/${
-                                person.avatarStyle || 'avataaars'
-                              }/svg?seed=${encodeURIComponent(
-                                person.username || 'SkillLink User'
-                              )}`
-                            }
-                            alt={person.username || 'SkillLink User'}
+                           src={
+  person.profileImage ||
+  `https://api.dicebear.com/9.x/${
+    person.avatarStyle || 'avataaars'
+  }/svg?seed=${encodeURIComponent(
+    String(person._id || person.username || 'SkillLink User')
+  )}`
+}
+                            alt={person.username || person.fullName || 'SkillLink User'}
                             className="person-avatar"
+                            onError={(e) => {
+  const fallback = `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(
+    String(person._id || person.username || 'SkillLink User')
+  )}`;
+
+  if (e.currentTarget.src !== fallback) {
+    e.currentTarget.src = fallback;
+  }
+}}
                           />
 
                               <div className="person-basic-info">
                                 <h3 className="person-name">
-                                {person.username || 'SkillLink User'}
+                                {person.username || person.fullName || 'SkillLink User'}
                               </h3>
 
                                 <span className="person-role">
@@ -1582,7 +1598,7 @@ useEffect(() => {
                   id="connection-modal-title"
                   className="connection-modal-heading"
                 >
-                  Connect with {selectedPerson.username || 'SkillLink Member'}
+                  Connect with {selectedPerson.username || selectedPerson.fullName || 'SkillLink Member'}
                 </h2>
 
               <p className="connection-modal-subtitle">
@@ -1593,7 +1609,7 @@ useEffect(() => {
                 <img
                   src={
                     selectedPerson.profileImage ||
-                    `https://api.dicebear.com/7.x/${
+                    `https://api.dicebear.com/9.x/${
                       selectedPerson.avatarStyle || 'avataaars'
                     }/svg?seed=${encodeURIComponent(
                       selectedPerson.username || 'SkillLink User'
@@ -1605,7 +1621,7 @@ useEffect(() => {
 
                 <div className="connection-person-info">
                   <h3 className="connection-person-name">
-                    {selectedPerson.username || 'SkillLink Member'}
+                    {selectedPerson.username || selectedPerson.fullName || 'SkillLink Member'}
                   </h3>
 
                   <p className="connection-person-role">
