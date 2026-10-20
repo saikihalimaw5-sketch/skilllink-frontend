@@ -205,14 +205,24 @@ function Login({ onSwitchToSignUp, onGoHome, onLoginSuccess }) {
   );
 }
 
-     if (onLoginSuccess) {
-  onLoginSuccess({
-    ...response.data,
-    user: JSON.parse(localStorage.getItem('user'))
-  });
+     
+const loggedInUser = response.data.user;
+
+if (loggedInUser?.role === 'admin') {
+  navigate('/admin/dashboard', { replace: true });
+} else if (loggedInUser?.role === 'student') {
+  if (onLoginSuccess) {
+    onLoginSuccess({
+      ...response.data,
+      user: JSON.parse(localStorage.getItem('user'))
+    });
+  } else {
+    navigate('/hobbies', { replace: true });
+  }
+} else {
+  setServerError('Account role is not supported.');
 }
 
-      navigate('/hobbies');
     } catch (err) {
       setServerError(
         err.response?.data?.message ||

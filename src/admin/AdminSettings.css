@@ -1,0 +1,761 @@
+
+/* ==========================================
+   SKILLLINK ADMIN SETTINGS — MAUVE THEME
+========================================== */
+
+.admin-settings-page {
+  --settings-bg: #191426;
+  --settings-panel: #1d172b;
+  --settings-inner: #140f20;
+  --settings-border: #40304e;
+  --settings-mauve: #684c65;
+  --settings-mauve-hover: #805f7c;
+  --settings-text: #f8f3fa;
+  --settings-muted: #b9a8c5;
+
+  width: 100%;
+  min-height: 100%;
+  padding: 8px 0 32px;
+  color: var(--settings-text);
+}
+
+.admin-settings-page *,
+.admin-settings-page *::before,
+.admin-settings-page *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   MAIN GRID
+========================================== */
+
+.admin-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* ==========================================
+   MAIN CARDS
+========================================== */
+
+.admin-settings-card {
+  min-width: 0;
+  padding: 26px;
+  background:
+    radial-gradient(
+      ellipse at top right,
+      rgba(104, 76, 101, 0.13),
+      transparent 55%
+    ),
+    var(--settings-bg);
+  border: 1px solid var(--settings-border);
+  border-radius: 18px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.13);
+}
+
+.admin-settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.admin-settings-card-header h2 {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.admin-settings-card-header p {
+  margin: 0;
+  color: var(--settings-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   HEADER ICONS
+========================================== */
+
+.admin-settings-icon {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #6c4b69;
+  border-radius: 13px;
+  color: #f1d9ec;
+  background: linear-gradient(
+    145deg,
+    #704b70,
+    #49314f
+  );
+}
+
+.admin-settings-icon.profile-icon,
+.admin-settings-icon.security-icon,
+.admin-settings-icon.system-icon {
+  color: #f1d9ec;
+  background: linear-gradient(
+    145deg,
+    #704b70,
+    #49314f
+  );
+}
+
+/* ==========================================
+   ADMIN PROFILE
+========================================== */
+
+.admin-settings-profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-settings-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  padding: 25px 15px;
+  min-height: 176px;
+  border: 1px solid #493651;
+  border-radius: 15px;
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(137, 94, 136, 0.24),
+      transparent 65%
+    ),
+    linear-gradient(
+      135deg,
+      #30203e,
+      #21182f
+    );
+}
+
+.admin-settings-avatar {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  border: 3px solid #b68ab2;
+  background: #30223e;
+  box-shadow: 0 0 0 5px rgba(182, 138, 178, 0.12);
+}
+
+.admin-settings-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.admin-settings-avatar-upload {
+  position: absolute;
+  right: -4px;
+  bottom: 0;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: var(--settings-mauve);
+  border: 2px solid #21182f;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.admin-settings-avatar-upload:hover {
+  background: var(--settings-mauve-hover);
+  transform: scale(1.07);
+}
+
+.admin-settings-avatar-upload:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.admin-settings-avatar-section small {
+  color: #d6c4d9;
+  font-size: 12px;
+}
+
+/* ==========================================
+   PROFILE FIELDS
+========================================== */
+
+.admin-settings-profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-settings-profile-fields label,
+.admin-settings-form-group label {
+  color: #e8dce9;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.admin-settings-profile-fields input,
+.admin-settings-form-group input {
+  width: 100%;
+  height: 46px;
+  padding: 0 15px;
+  color: #f8f3fa;
+  background: var(--settings-inner);
+  border: 1px solid #453550;
+  border-radius: 10px;
+  outline: none;
+  font-size: 13px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.admin-settings-profile-fields input::placeholder,
+.admin-settings-form-group input::placeholder {
+  color: #93839e;
+}
+
+.admin-settings-profile-fields input:focus,
+.admin-settings-form-group input:focus {
+  border-color: #a67d9e;
+  box-shadow: 0 0 0 3px rgba(166, 125, 158, 0.12);
+}
+
+.admin-settings-profile-fields input[readonly] {
+  color: #b8a9c0;
+  background: #20192b;
+  cursor: default;
+}
+
+.admin-settings-profile-fields input:disabled,
+.admin-settings-form-group input:disabled {
+  opacity: 0.65;
+}
+
+/* ==========================================
+   MUTED MAUVE BUTTONS
+========================================== */
+
+.admin-settings-save-btn,
+.admin-settings-password-btn {
+  width: 100%;
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 18px;
+
+  color: #ffffff;
+  background: #684c65;
+  border: 1px solid #886983;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1px;
+
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.admin-settings-save-btn:not(:disabled),
+.admin-settings-password-btn:not(:disabled) {
+  cursor: pointer;
+}
+
+.admin-settings-save-btn:not(:disabled):hover,
+.admin-settings-password-btn:not(:disabled):hover {
+  background: #805f7c;
+  border-color: #a07c9a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(104, 76, 101, 0.2);
+}
+
+.admin-settings-save-btn:disabled,
+.admin-settings-password-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   ACCOUNT SECURITY
+========================================== */
+
+.admin-settings-security-form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.admin-settings-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.admin-password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.admin-password-input-wrap input {
+  width: 100%;
+  padding-right: 48px;
+}
+
+.admin-password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+  padding: 5px;
+
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #c4a6c2;
+  cursor: pointer;
+
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.admin-password-toggle:hover {
+  color: #ffffff;
+  background: rgba(166, 125, 158, 0.18);
+}
+
+.admin-password-toggle:focus-visible {
+  outline: 2px solid #c49ab9;
+  outline-offset: 2px;
+}
+
+.admin-password-toggle svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   OPTIONAL PASSWORD REQUIREMENTS BOX
+========================================== */
+
+.admin-settings-password-requirements {
+  padding: 15px 17px;
+  background: rgba(104, 76, 101, 0.14);
+  border: 1px solid #604761;
+  border-radius: 11px;
+}
+
+.admin-settings-password-requirements h4 {
+  margin: 0 0 11px;
+  color: #e6c9df;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-settings-password-requirements ul {
+  margin: 0;
+  padding-left: 19px;
+  color: #c9b8cf;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+/* ==========================================
+   SYSTEM INFORMATION
+========================================== */
+
+.admin-settings-system {
+  grid-column: 1 / -1;
+}
+
+.admin-settings-system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-settings-system-item {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 17px 19px;
+
+  background: #151020;
+  border: 1px solid #3c2e49;
+  border-radius: 12px;
+
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+
+.admin-settings-system-item:hover {
+  background: #21182e;
+  border-color: #705471;
+  transform: translateY(-1px);
+}
+
+.admin-settings-system-item span {
+  color: #bca9c5;
+  font-size: 12px;
+}
+
+.admin-settings-system-item strong {
+  color: #f5eff8;
+  font-size: 13px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   SYSTEM BADGES - MAUVE
+========================================== */
+
+.admin-settings-system-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 12px;
+
+  color: #f3ddec;
+  background: #4d354f;
+  border: 1px solid #765775;
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-settings-system-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #d9afd2;
+}
+
+/* Layout for upgraded system items */
+
+.admin-settings-system-item:has(
+  .admin-settings-system-badge
+) {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-settings-system-details {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.admin-settings-system-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid #634767;
+  border-radius: 10px;
+  color: #e6c7e2;
+  background: #382740;
+}
+
+.admin-settings-system-content {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+/* ==========================================
+   OTP MODAL COLOR OVERRIDES
+   Keeps existing OTP logic untouched
+========================================== */
+
+.admin-settings-page .admin-otp-modal {
+  border-color: #715572 !important;
+  background: #1b1428 !important;
+}
+
+.admin-settings-page .admin-otp-modal input:focus {
+  border-color: #b58cac !important;
+  outline-color: #b58cac !important;
+}
+
+.admin-settings-page .admin-otp-modal button[type="submit"] {
+  background: #684c65 !important;
+  border: 1px solid #886983 !important;
+  transition: background 0.2s;
+}
+
+.admin-settings-page .admin-otp-modal button[type="submit"]:not(:disabled):hover {
+  background: #805f7c !important;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .admin-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-settings-system {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-settings-card {
+    padding: 21px 17px;
+    border-radius: 15px;
+  }
+
+  .admin-settings-card-header {
+    align-items: flex-start;
+    margin-bottom: 23px;
+  }
+
+  .admin-settings-card-header h2 {
+    font-size: 17px;
+  }
+
+  .admin-settings-system-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-settings-system-item {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 400px) {
+  .admin-settings-system-item:has(
+    .admin-settings-system-badge
+  ) {
+    flex-wrap: wrap;
+  }
+
+  .admin-settings-system-badge {
+    margin-left: 53px;
+  }
+}
+
+/* ==========================================
+   ADMIN SETTINGS — FINAL MAUVE POLISH
+========================================== */
+
+/* Consistent dusty mauve buttons */
+.admin-settings-save-btn,
+.admin-settings-password-btn {
+  background: #684c65;
+  color: #ffffff;
+  border: 1px solid #886983;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.admin-settings-save-btn:not(:disabled):hover,
+.admin-settings-password-btn:not(:disabled):hover {
+  background: #805f7c;
+  border-color: #a07c9a;
+}
+
+/* System Information cards */
+.admin-settings-system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-settings-system-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-height: 95px;
+  padding: 18px 20px;
+  background: #171120;
+  border: 1px solid #48354d;
+  border-radius: 13px;
+}
+
+.admin-settings-system-item:hover {
+  background: #211829;
+  border-color: #866582;
+}
+
+/* Icon + information */
+.admin-settings-system-content {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-settings-system-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  color: #e9cde5;
+  background: #38273d;
+  border: 1px solid #684c65;
+  border-radius: 11px;
+}
+
+.admin-settings-system-details {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.admin-settings-system-details span {
+  color: #b9a6c1;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.admin-settings-system-details strong {
+  color: #f5edf5;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+/* Muted mauve badges */
+.admin-settings-system-item .admin-settings-system-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  padding: 7px 12px;
+  flex-shrink: 0;
+  color: #f4e0f0;
+  background: #4d354f;
+  border: 1px solid #785a76;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-settings-system-badge::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  background: #d9afd2;
+  border-radius: 50%;
+}
+
+/* Password requirements */
+.admin-settings-password-requirements {
+  padding: 16px 18px;
+  background: rgba(104, 76, 101, 0.14);
+  border: 1px solid #684c65;
+  border-radius: 12px;
+}
+
+.admin-settings-password-requirements h4 {
+  margin: 0 0 10px;
+  color: #eacde4;
+  font-size: 13px;
+}
+
+.admin-settings-password-requirements ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #cbb8d0;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+/* OTP verification button */
+.admin-settings-page .admin-otp-modal button[type="submit"] {
+  background: #684c65 !important;
+  border: 1px solid #886983 !important;
+}
+
+.admin-settings-page
+  .admin-otp-modal
+  button[type="submit"]:not(:disabled):hover {
+  background: #805f7c !important;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .admin-settings-system-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-settings-system-item {
+    padding: 16px;
+  }
+
+  .admin-settings-system-item .admin-settings-system-badge {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-settings-system-item {
+    align-items: flex-start;
+  }
+
+  .admin-settings-system-item .admin-settings-system-badge {
+    margin-left: 56px;
+  }
+}

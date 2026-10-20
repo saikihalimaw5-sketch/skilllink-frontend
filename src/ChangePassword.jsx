@@ -58,10 +58,11 @@ function ChangePassword() {
   };
 
   // Password validation
+  
+  // Password validation - same requirements as Signup
   const hasMinLength = newPassword.length >= 8;
   const hasUppercase = /[A-Z]/.test(newPassword);
-  const hasLowercase = /[a-z]/.test(newPassword);
-  const hasNumber = /[0-9]/.test(newPassword);
+  const hasNoSpaces = !/\s/.test(newPassword);
 
   const passwordsMatch =
     newPassword.length > 0 &&
@@ -70,9 +71,9 @@ function ChangePassword() {
   const isPasswordValid =
     hasMinLength &&
     hasUppercase &&
-    hasLowercase &&
-    hasNumber &&
+    hasNoSpaces &&
     passwordsMatch;
+
 
   const isOtpValid = /^\d{6}$/.test(otp.trim());
 
@@ -479,50 +480,28 @@ function ChangePassword() {
               </div>
             </div>
 
-            {/* PASSWORD CHECKLIST */}
-            {newPassword.length > 0 && (
-              <div className="password-checklist">
-                <div
-                  className={`check-item ${
-                    hasMinLength ? 'valid' : ''
-                  }`}
-                >
-                  {hasMinLength ? '✓' : '○'} At least 8 characters
-                </div>
+            
+{/* PASSWORD CHECKLIST */}
+{newPassword.length > 0 && (
+  <div className="password-checklist">
+    <div className={`check-item ${hasMinLength ? 'valid' : ''}`}>
+      {hasMinLength ? '✓' : '○'} At least 8 characters
+    </div>
 
-                <div
-                  className={`check-item ${
-                    hasUppercase ? 'valid' : ''
-                  }`}
-                >
-                  {hasUppercase ? '✓' : '○'} At least 1 uppercase letter
-                </div>
+    <div className={`check-item ${hasUppercase ? 'valid' : ''}`}>
+      {hasUppercase ? '✓' : '○'} At least 1 uppercase letter
+    </div>
 
-                <div
-                  className={`check-item ${
-                    hasLowercase ? 'valid' : ''
-                  }`}
-                >
-                  {hasLowercase ? '✓' : '○'} At least 1 lowercase letter
-                </div>
+    <div className={`check-item ${hasNoSpaces ? 'valid' : ''}`}>
+      {hasNoSpaces ? '✓' : '○'} No spaces allowed
+    </div>
 
-                <div
-                  className={`check-item ${
-                    hasNumber ? 'valid' : ''
-                  }`}
-                >
-                  {hasNumber ? '✓' : '○'} At least 1 number
-                </div>
+    <div className={`check-item ${passwordsMatch ? 'valid' : ''}`}>
+      {passwordsMatch ? '✓' : '○'} Passwords match
+    </div>
+  </div>
+)}
 
-                <div
-                  className={`check-item ${
-                    passwordsMatch ? 'valid' : ''
-                  }`}
-                >
-                  {passwordsMatch ? '✓' : '○'} Passwords match
-                </div>
-              </div>
-            )}
 
             {/* UPDATE PASSWORD */}
             <button

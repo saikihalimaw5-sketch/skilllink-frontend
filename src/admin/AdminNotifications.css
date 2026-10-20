@@ -1,0 +1,116 @@
+
+/* ==========================================
+   ADMIN NOTIFICATIONS
+========================================== */
+
+.admin-notifications-page {
+  width: 100%;
+  animation: notifFadeIn 0.3s ease;
+}
+
+.admin-notifications-heading {
+  margin-bottom: 22px;
+}
+
+.admin-notifications-heading h2 {
+  margin: 0 0 8px;
+  font-size: 23px;
+  font-weight: 700;
+  color: #f8f2fa;
+}
+
+.admin-notifications-heading p {
+  margin: 0;
+  font-size: 14px;
+  color: #b9a9c2;
+  line-height: 1.6;
+}
+
+.admin-notifications-page .admin-panel {
+  background: linear-gradient(135deg, #1a1425, #281a35);
+  border: 1px solid rgba(215, 180, 210, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.admin-notifications-page .admin-panel-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(215, 180, 210, 0.12);
+}
+
+.admin-notifications-page .admin-panel-header h3 {
+  margin: 0;
+  color: #f5eaf6;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.admin-notifications-page .admin-panel-header button {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.admin-notifications-page .admin-panel-header button:hover:not(:disabled) {
+  background: #805d7d !important;
+  transform: translateY(-1px);
+}
+
+.admin-notifications-page .admin-panel-header button:disabled {
+  opacity: 0.55;
+}
+
+.admin-notifications-page .admin-panel-header + div > div {
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.admin-notifications-page .admin-panel-header + div > div:hover {
+  background: rgba(215, 180, 210, 0.055);
+}
+
+.admin-notifications-page h4 {
+  color: #f7eff8;
+}
+
+.admin-notifications-page .admin-panel p {
+  color: #c8b9ce;
+}
+
+.admin-notifications-page .admin-empty-state {
+  color: #bca9c6;
+}
+
+@keyframes notifFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-notifications-heading h2 {
+    font-size: 21px;
+  }
+
+  .admin-notifications-page .admin-panel {
+    padding: 18px !important;
+    border-radius: 14px;
+  }
+
+  .admin-notifications-page .admin-panel-header + div > div {
+    padding: 16px 6px !important;
+  }
+}
+
+/* DUSTY MAUVE NOTIFICATION CARDS */
+
+.admin-notification-card:hover {
+  background: rgba(155, 113, 149, 0.19) !important;
+  border-color: rgba(181, 138, 170, 0.55) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(155, 113, 149, 0.08);
+}

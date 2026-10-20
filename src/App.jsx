@@ -10,6 +10,8 @@ import ChangePassword from './ChangePassword';
 import Messages from './Messages';
 import Notifications from './Notifications';
 import Explore from './Explore';
+import AdminDashboard from './admin/AdminDashboard';
+import { Navigate } from 'react-router-dom';
 import './App.css';
 
 // Landing page component
@@ -223,6 +225,21 @@ function App() {
         path="/notifications"
         element={<Notifications />}
       />
+
+      
+{/* Protected Admin Dashboard */}
+<Route
+  path="/admin/dashboard"
+  element={
+    localStorage.getItem('token') &&
+    JSON.parse(localStorage.getItem('user') || '{}')?.role === 'admin' ? (
+      <AdminDashboard />
+    ) : (
+      <Navigate to="/login" replace />
+    )
+  }
+/>
+
     </Routes>
   );
 }

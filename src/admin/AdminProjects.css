@@ -1,0 +1,1106 @@
+
+/* ==========================================
+   SKILLLINK ADMIN - PROJECT MANAGEMENT
+========================================== */
+
+.admin-projects-page {
+  width: 100%;
+  color: #f8f5ff;
+}
+
+.admin-projects-page * {
+  box-sizing: border-box;
+}
+
+/* PAGE HEADER */
+
+.admin-projects-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.admin-projects-heading h2 {
+  margin: 0 0 8px;
+  font-size: 27px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.admin-projects-heading p {
+  margin: 0;
+  color: #a9a1bc;
+  font-size: 14px;
+}
+
+/* SEARCH AND FILTERS */
+
+.admin-projects-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.admin-projects-search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 250px;
+  gap: 10px;
+  height: 45px;
+  padding: 0 15px;
+  border: 1px solid #453255;
+  border-radius: 10px;
+  background: #1e1728;
+  color: #b88aff;
+}
+
+.admin-projects-search:focus-within {
+  border-color: #a678f5;
+}
+
+.admin-projects-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.admin-projects-search input::placeholder {
+  color: #857992;
+}
+
+.admin-projects-toolbar select {
+  height: 45px;
+  min-width: 145px;
+  padding: 0 15px;
+  border: 1px solid #453255;
+  border-radius: 10px;
+  background: #251a31;
+  color: #e9dcff;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-projects-toolbar select:focus {
+  border-color: #a678f5;
+}
+
+.admin-projects-toolbar select option {
+  background: #21162e;
+  color: #ffffff;
+}
+
+/* PROJECT TABLE */
+
+.admin-projects-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #3d2b4e;
+  border-radius: 14px;
+  background: #1b1425;
+}
+
+.admin-projects-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-projects-table thead {
+  background: #2c1d3a;
+}
+
+.admin-projects-table th {
+  padding: 17px 18px;
+  color: #d9b9ff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-projects-table td {
+  padding: 15px 18px;
+  border-top: 1px solid #352640;
+  color: #c8bfd4;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.admin-projects-table tbody tr:hover {
+  background: #281b36;
+}
+
+/* PROJECT NAME */
+
+.admin-project-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-project-name strong {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-project-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1px solid #65457d;
+  border-radius: 9px;
+  background: #3c2950;
+  color: #c084fc;
+}
+
+/* MEMBER COUNT */
+
+.admin-project-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 29px;
+  padding: 0 9px;
+  border: 1px solid #604478;
+  border-radius: 7px;
+  background: #362345;
+  color: #d8b4fe;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* PROJECT STATUS */
+
+.admin-project-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-project-status.active {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.admin-project-status.completed {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.14);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.admin-project-status.archived {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* VIEW BUTTON */
+
+.admin-project-view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #8054bf;
+  border-radius: 9px;
+  background: rgba(147, 85, 214, 0.15);
+  color: #d8b4fe;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-project-view:hover {
+  background: #7949cf;
+  color: #ffffff;
+  border-color: #a879f0;
+}
+
+/* EMPTY, LOADING, ERROR */
+
+.admin-projects-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 190px;
+  padding: 30px;
+  color: #bdb0c8;
+  text-align: center;
+}
+
+.admin-projects-empty svg {
+  color: #a78bfa;
+}
+
+.admin-projects-empty h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.admin-projects-empty p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* PAGINATION */
+
+.admin-projects-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px 4px;
+  color: #a9a1bc;
+  font-size: 12px;
+}
+
+.admin-projects-pagination p {
+  margin: 0;
+}
+
+.admin-projects-page-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-projects-page-buttons button {
+  padding: 9px 15px;
+  border: 1px solid #59416f;
+  border-radius: 8px;
+  background: #30213f;
+  color: #e9dcff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.admin-projects-page-buttons button:hover:not(:disabled) {
+  background: #62465e;
+  border-color: #846580;
+}
+
+.admin-projects-page-buttons button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.admin-projects-page-buttons span {
+  color: #d8b4fe;
+  font-weight: 700;
+}
+
+/* ==========================================
+   PROJECT DETAILS MODAL
+========================================== */
+
+.admin-project-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 3, 12, 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.admin-project-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #51366c;
+  border-radius: 18px;
+  background: #1b1327;
+  color: #ffffff;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.admin-project-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 22px 26px;
+  border-bottom: 1px solid #392849;
+}
+
+.admin-project-modal-header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.admin-project-modal-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  border: 1px solid #4d375f;
+  border-radius: 9px;
+  background: #2a1c39;
+  color: #d8c4ed;
+  cursor: pointer;
+}
+
+.admin-project-modal-header button:hover {
+  background: #6d3c9c;
+  color: #ffffff;
+}
+
+.admin-project-modal-body {
+  padding: 24px 26px 30px;
+}
+
+.admin-project-modal-body > p {
+  margin: 0 0 15px;
+  padding: 13px 15px;
+  border: 1px solid #3d2b50;
+  border-radius: 10px;
+  background: #241932;
+  color: #e9dcff;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.admin-project-modal-body strong {
+  color: #c9a5ed;
+}
+
+.admin-project-modal-body h3 {
+  margin: 24px 0 12px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.admin-project-modal-body ul {
+  margin: 0;
+  padding: 15px 15px 15px 35px;
+  border: 1px solid #3d2b50;
+  border-radius: 10px;
+  background: #241932;
+  color: #e9dcff;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .admin-projects-heading h2 {
+    font-size: 23px;
+  }
+
+  .admin-projects-toolbar {
+    align-items: stretch;
+  }
+
+  .admin-projects-search {
+    flex-basis: 100%;
+  }
+
+  .admin-projects-toolbar select {
+    flex: 1;
+  }
+
+  .admin-projects-pagination {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .admin-project-modal-header {
+    padding: 18px;
+  }
+
+  .admin-project-modal-body {
+    padding: 18px;
+  }
+}
+
+/* ==========================================
+   PROJECT OWNER PROFILE
+========================================== */
+
+.admin-project-owner {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 150px;
+}
+
+.admin-project-owner-avatar {
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #8054bf;
+  background: #362345;
+}
+
+.admin-project-owner strong {
+  color: #f8f5ff;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   ADMIN PROJECTS - MEMBER PROFILES
+========================================== */
+
+
+.admin-project-members {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+  max-width: 320px;
+}
+
+.admin-project-member {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: auto;
+  padding: 5px 9px 5px 5px;
+  border: 1px solid #493354;
+  border-radius: 25px;
+  background: #281b35;
+}
+
+.admin-project-member-avatar {
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #8054bf;
+  background: #362345;
+}
+
+.admin-project-member span {
+  color: #f8f5ff;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+
+.admin-project-member {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+}
+
+.admin-project-member-avatar {
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #8054bf;
+  background: #362345;
+}
+
+.admin-project-member span {
+  color: #f8f5ff;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.admin-project-no-members {
+  color: #9589a8;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Hover effect */
+.admin-project-member:hover span {
+  color: #d8b4fe;
+}
+
+/* Keep member profiles aligned */
+.admin-projects-table td:has(.admin-project-members) {
+  vertical-align: middle;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-project-members {
+    min-width: 130px;
+  }
+
+  .admin-project-member-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .admin-project-member span {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================
+   COMPACT MEMBERS LAYOUT
+========================================== */
+
+.admin-project-members {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admin-project-member {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: auto;
+  gap: 6px;
+  padding: 3px 8px 3px 3px;
+  border: 1px solid #493354;
+  border-radius: 20px;
+  background: #281b35;
+}
+
+.admin-project-member-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #8054bf;
+}
+
+.admin-project-member span {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ==========================================
+   MEMBERS - SLIGHTLY BIGGER DESIGN
+========================================== */
+
+.admin-project-members {
+  gap: 8px;
+}
+
+.admin-project-member {
+  gap: 8px;
+  padding: 5px 11px 5px 5px;
+  border-radius: 22px;
+}
+
+.admin-project-member-avatar {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #8054bf;
+}
+
+.admin-project-member span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ==========================================
+   ADMIN PROJECTS - CATEGORY BADGES
+========================================== */
+
+.admin-project-category {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: 1px solid #604478;
+  background: #362345;
+  color: #d8b4fe;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* CREATIVE CATEGORIES */
+
+.admin-project-category.art,
+.admin-project-category.photography,
+.admin-project-category.music,
+.admin-project-category.creative {
+  color: #f9a8d4;
+  background: rgba(236, 72, 153, 0.13);
+  border-color: rgba(236, 72, 153, 0.4);
+}
+
+/* ENTERTAINMENT */
+
+.admin-project-category.gaming,
+.admin-project-category.entertainment {
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.13);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+/* FITNESS */
+
+.admin-project-category.fitness,
+.admin-project-category.sports,
+.admin-project-category.cycling {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.13);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* LIFESTYLE */
+
+.admin-project-category.lifestyle,
+.admin-project-category.travel,
+.admin-project-category.reading,
+.admin-project-category.cooking {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.13);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+/* ==========================================
+   ADMIN PROJECTS - CATEGORY BADGES
+========================================== */
+
+.admin-project-category {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+/* CREATIVE - PINK */
+.admin-project-category.creative {
+  color: #f9a8d4;
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.4);
+}
+
+/* ENTERTAINMENT - ORANGE */
+.admin-project-category.entertainment {
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+/* FITNESS - GREEN */
+.admin-project-category.fitness {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+/* LIFESTYLE - BLUE */
+.admin-project-category.lifestyle {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+/* DEFAULT - PURPLE */
+.admin-project-category.default {
+  color: #d8b4fe;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+/* HOVER EFFECT */
+.admin-project-category:hover {
+  filter: brightness(1.15);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .admin-project-category {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
+/* ==========================================
+   ADMIN PROJECT DETAILS - IMPROVED DESIGN
+========================================== */
+
+.admin-project-modal {
+  max-width: 650px;
+  border-radius: 18px;
+  background: #1b1425;
+}
+
+.admin-project-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+/* INFORMATION CARDS */
+
+.admin-modal-info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid #493354;
+  border-radius: 11px;
+  background: #251a31;
+}
+
+.admin-modal-label {
+  color: #ad9bbf;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-modal-info-card strong {
+  color: #f8f5ff;
+  font-size: 13px;
+}
+
+/* TWO-COLUMN INFORMATION */
+
+.admin-modal-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-modal-info-grid .admin-modal-info-card {
+  height: 100%;
+}
+
+/* DESCRIPTION AND SKILLS */
+
+.admin-modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-modal-section h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-modal-section > p,
+.admin-modal-skills {
+  margin: 0;
+  padding: 15px;
+  border: 1px solid #493354;
+  border-radius: 10px;
+  background: #251a31;
+  color: #d8cbe6;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.admin-modal-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-modal-skill {
+  padding: 7px 12px;
+  border: 1px solid #8054bf;
+  border-radius: 8px;
+  background: #362345;
+  color: #d8b4fe;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* MEMBER PROFILE CARDS */
+
+.admin-modal-members {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-modal-member {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #493354;
+  border-radius: 10px;
+  background: #251a31;
+}
+
+.admin-modal-member strong {
+  color: #f8f5ff;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.admin-modal-member .admin-project-member-avatar {
+  width: 34px;
+  height: 34px;
+}
+
+.admin-modal-members > p {
+  color: #ad9bbf;
+  font-size: 13px;
+}
+
+/* RESPONSIVE MODAL */
+
+@media (max-width: 600px) {
+  .admin-project-modal {
+    max-width: 100%;
+  }
+
+  .admin-project-modal-body {
+    padding: 18px;
+  }
+
+  .admin-modal-info-grid,
+  .admin-modal-members {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================
+   ADMIN PROJECTS - FINAL COLUMN ALIGNMENT
+   ========================================== */
+
+/* Match header and body column positions */
+.admin-projects-table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* Shared header and cell spacing */
+.admin-projects-table th,
+.admin-projects-table td {
+  padding: 16px 18px;
+  vertical-align: middle;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* Prevent header wrapping */
+.admin-projects-table th {
+  white-space: nowrap;
+}
+
+/* 1 - Project Name */
+.admin-projects-table th:nth-child(1),
+.admin-projects-table td:nth-child(1) {
+  width: 19%;
+  text-align: left;
+}
+
+/* 2 - Owner */
+.admin-projects-table th:nth-child(2),
+.admin-projects-table td:nth-child(2) {
+  width: 16%;
+  text-align: left;
+}
+
+/* 3 - Category */
+.admin-projects-table th:nth-child(3),
+.admin-projects-table td:nth-child(3) {
+  width: 13%;
+  text-align: center;
+}
+
+/* 4 - Members */
+.admin-projects-table th:nth-child(4),
+.admin-projects-table td:nth-child(4) {
+  width: 20%;
+  text-align: left;
+}
+
+/* 5 - Status */
+.admin-projects-table th:nth-child(5),
+.admin-projects-table td:nth-child(5) {
+  width: 11%;
+  text-align: center;
+}
+
+/* 6 - Created Date */
+.admin-projects-table th:nth-child(6),
+.admin-projects-table td:nth-child(6) {
+  width: 13%;
+  text-align: center;
+}
+
+/* 7 - Actions */
+.admin-projects-table th:nth-child(7),
+.admin-projects-table td:nth-child(7) {
+  width: 8%;
+  text-align: center;
+}
+
+/* Keep project icons and titles aligned */
+.admin-projects-table .admin-project-name,
+.admin-projects-table .admin-project-owner {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+/* Prevent long text from breaking layout */
+.admin-projects-table .admin-project-name strong,
+.admin-projects-table .admin-project-owner strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Members stay inside their column */
+.admin-projects-table .admin-project-members {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Center badges within centered columns */
+.admin-projects-table td:nth-child(3) .admin-project-category,
+.admin-projects-table td:nth-child(5) .admin-project-status {
+  vertical-align: middle;
+}
+
+/* Center action button */
+.admin-projects-table td:nth-child(7) .admin-project-view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* ==========================================
+   ADMIN PROJECTS - DUSTY MAUVE TABLE
+========================================== */
+
+/* Table container */
+.admin-projects-page .admin-projects-table-wrapper {
+  background: #241a2b;
+  border: 1px solid #684c65;
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+/* Table */
+.admin-projects-page .admin-projects-table {
+  width: 100%;
+  background: #241a2b;
+  border-collapse: collapse;
+}
+
+/* Table header */
+.admin-projects-page .admin-projects-table thead,
+.admin-projects-page .admin-projects-table th {
+  background: #49344b;
+  color: #f1ddec;
+}
+
+/* Table rows */
+.admin-projects-page .admin-projects-table tbody tr {
+  background: #281d30;
+  transition: background 0.2s ease;
+}
+
+.admin-projects-page
+.admin-projects-table
+tbody tr:nth-child(even) {
+  background: #302337;
+}
+
+.admin-projects-page .admin-projects-table tbody tr:hover {
+  background: #403047;
+}
+
+/* Table cells */
+.admin-projects-page .admin-projects-table th,
+.admin-projects-page .admin-projects-table td {
+  border-bottom: 1px solid #48354d;
+}
+
+.admin-projects-page .admin-projects-table td {
+  color: #eadcea;
+}
+
+/* Project folder icon */
+.admin-projects-page .admin-project-icon {
+  background: #38273d;
+  border: 1px solid #684c65;
+  color: #d7b4d2;
+}
+
+/* View button */
+.admin-projects-page .admin-project-view {
+  background: #49344b;
+  border: 1px solid #785a76;
+  color: #f4e6f1;
+  border-radius: 9px;
+}
+
+.admin-projects-page .admin-project-view:hover {
+  background: #684c65;
+  border-color: #a783a0;
+  color: #ffffff;
+}
+
+
